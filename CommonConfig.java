@@ -16,15 +16,22 @@ class CommonConfig {
 	    f = new Scanner(new File(configFileName));
 	}
 	catch (FileNotFoundException exc) {
+	    System.out.println("error: config file not found");
 	    return;
 	}
-	
-	NumberOfPreferredNeighbors = f.skip("NumberOfPreferredNeighbors").nextInt();
-	UnchokingInterval = f.skip("UnchokingInterval").nextInt();
-	OptimisticUnchokingInterval = f.skip("OptimisticUnchokingInterval").nextInt();
-	FileName = f.skip("FileName").next();
-	FileSize = f.skip("FileSize").nextInt();
-	PieceSize = f.skip("PieceSize").nextInt();
+
+	f.next(); // skip over the string "NumberOfPreferredNeighbors"; should probably check this
+	NumberOfPreferredNeighbors = f.nextInt();
+	f.next();
+	UnchokingInterval = f.nextInt();
+	f.next();
+	OptimisticUnchokingInterval = f.nextInt();
+	f.next();
+	FileName = f.next();
+	f.next();
+	FileSize = f.nextInt();
+	f.next();
+	PieceSize = f.nextInt();
     }
 
     int getNumberOfPreferredNeighbors() { return NumberOfPreferredNeighbors; }
