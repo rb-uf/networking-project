@@ -48,6 +48,8 @@ public class ServerSample {
 				out.flush();
 				in = new ObjectInputStream(connection.getInputStream());
 				try{
+                    
+
 					while(true)
 					{
 						//receive the message sent from the client
@@ -79,6 +81,19 @@ public class ServerSample {
 				}
 			}
 		}
+
+        //send bytes to client
+        //just using this for testing purposes, there are no checks
+        public void sendBytes(Object o){
+            try{
+				out.writeObject(o);
+				out.flush();
+				System.out.println("Sent some bytes to Client " + no);
+			}
+			catch(IOException ioException){
+				ioException.printStackTrace();
+			}
+        }
 
 		//send a message to the output stream
 		public void sendMessage(String msg)
