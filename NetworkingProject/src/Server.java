@@ -4,9 +4,10 @@ import java.nio.*;
 import java.nio.channels.*;
 import java.util.*;
 
-public class ServerSample {
+public class Server {
 
 	private static final int sPort = 8000;   //The server will be listening on this port number
+	private static final int peerID = 1001; // figure out how to set this later
 
 	public static void main(String[] args) throws Exception {
 		System.out.println("The server is running."); 
@@ -36,6 +37,8 @@ public class ServerSample {
        	private ObjectOutputStream out;    //stream write to the socket
 		private int no;		//The index number of the client
 
+		private int clientPeerID;
+
        	public Handler(Socket connection, int no) {
            	this.connection = connection;
 	   		this.no = no;
@@ -47,9 +50,11 @@ public class ServerSample {
 				out = new ObjectOutputStream(connection.getOutputStream());
 				out.flush();
 				in = new ObjectInputStream(connection.getInputStream());
-				try{
-                    
 
+				sendHandshake();
+				verifyHandshake();
+
+				try{
 					while(true)
 					{
 						//receive the message sent from the client
@@ -70,20 +75,12 @@ public class ServerSample {
 				System.out.println("Disconnect with Client " + no);
 			}
 			finally{
-				//Close connections
-				try{
-					in.close();
-					out.close();
-					connection.close();
-				}
-				catch(IOException ioException){
-					System.out.println("Disconnect with Client " + no);
-				}
+				closeConnection();
 			}
 		}
 
         //send bytes to client
-        //just using this for testing purposes, there are no checks
+        //just using this for testing purposes
         public void sendBytes(Object o){
             try{
 				out.writeObject(o);
@@ -108,6 +105,83 @@ public class ServerSample {
 			}
 		}
 
-	}
+		/*
+		 * NOTE: closing connection on one end will not immediately close connection on other end.
+		 * when the other end tries to use connection, it will throw error which is caught
+		 * by catch block, then finally block closes the connection.
+		 * So you can close connection whenever and you're still good.
+		 */
+		public void closeConnection(){
+			System.out.println("(Server Side) Closing Connection with peer: " + clientPeerID);
+			try{
+				in.close();
+				out.close();
+				connection.close();
+			}
+			catch(IOException ioException){
+				System.out.println("Disconnect with Client " + no);
+			}
+		}
 
-}
+		// sends a handshake to the client
+		public void sendHandshake(){
+			System.out.println("(Server Side) Sending handshake to peer");
+			byte[] h = utils.createHandshake(peerID);
+			try{
+				out.writeObject(h);
+				out.flush(); 
+			}
+			catch(IOException ioException){
+				ioException.printStackTrace();
+			}
+		}
+
+		// verifies the handshake
+		// checks if the string is correct, has 10 zero bytes, and checks the peerID
+		public void verifyHandshake(){
+			try{
+				byte[] handshake = (byte[])in.readObject();
+				byte[] strBytes = Arrays.copyOfRange(handshake, 0, 18);
+				byte[] zBytes = Arrays.copyOfRange(handshake, 18, 28);
+				byte[] intBytes = Arrays.copyOfRange(handshake, 28, 32);
+				
+				// checks string
+				String s = new String(strBytes);
+				if (!s.equals("P2PFILESHARINGPROJ")) {
+					System.out.println("(Server Side) Bad string in handshake");
+					closeConnection();
+				}
+
+				// checks zero bytes
+				boolean allZero = true;
+				for (byte b : zBytes) {
+					if (b != 0) {
+						allZero = false;
+						break; 
+					}
+				}
+				if(!allZero){
+					System.out.println("(Server Side) Bad zero bytes in handshake");
+					closeConnection();
+				}
+
+				// checks the client side peer ID
+				int handshakeID = utils.bytesToInt(intBytes);
+				// should verify that it is correct peerID somehow?
+				System.out.println("(Server Side) Connected to peer ID: " + handshakeID);
+				clientPeerID = handshakeID;
+			}
+			catch(ClassNotFoundException classnot){
+				// idk
+			}
+			catch(IOException ioException){
+				// idk
+			}
+		}
+
+	} // end of handler definition
+
+	
+
+
+} // end of server definition

@@ -1,6 +1,10 @@
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.Arrays;
 
-public class test {
+public class utils {
 
     // converts int to bytes
     public static byte[] intToBytes(int value) {
@@ -38,36 +42,11 @@ public class test {
         return r;
     }
 
-    // verifies the handshake
-    // can change if statement body to do different sutff in peers
-    public static void verifyHandshake(byte[] handshake){
-        byte[] strBytes = Arrays.copyOfRange(handshake, 0, 18);
-        byte[] zBytes = Arrays.copyOfRange(handshake, 18, 28);
-        byte[] intBytes = Arrays.copyOfRange(handshake, 28, 32);
-
-        String s = new String(strBytes);
-        if (!s.equals("P2PFILESHARINGPROJ")) {
-            System.out.println("bad string: " + s);
-        }
-        boolean allZero = true;
-        for (byte b : zBytes) {
-            if (b != 0) {
-                allZero = false;
-                break; 
-            }
-        }
-        if(!allZero){
-            System.out.println("bad zero bytes");
-        }
-        int peerID = bytesToInt(intBytes);
-        System.out.println("Peer ID: " + peerID);
-    }
 
     public static void main(String args[])
 	{
-		byte[] handshake = createHandshake(1001);
+		// just here for testing
 
-        verifyHandshake(handshake);
         
         
 
