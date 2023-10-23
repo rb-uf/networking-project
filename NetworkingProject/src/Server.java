@@ -16,8 +16,11 @@ public class Server {
     String FileName;
     int FileSize;
     int PieceSize;
+
+	BitField bf;
 	
 	// goes to common.cfg and reads in its info
+	// NOTE: does not check PeerInfo.cfg yet
 	public Server(){
 		Scanner f;
 		try {
@@ -40,6 +43,9 @@ public class Server {
 		FileSize = f.nextInt();
 		f.next();
 		PieceSize = f.nextInt();
+
+		// initilizes bit field, all values to 0
+		bf = new BitField(FileSize, PieceSize);
 	}
 
 	int getNumberOfPreferredNeighbors() { return NumberOfPreferredNeighbors; }
