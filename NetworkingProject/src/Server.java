@@ -87,6 +87,7 @@ public class Server {
 		private int no;		//The index number of the client
 
 		private int clientPeerID;
+		private BitField clientBitField;
 
        	public Handler(Socket connection, int no) {
            	this.connection = connection;
@@ -127,19 +128,6 @@ public class Server {
 				closeConnection();
 			}
 		}
-
-        //send bytes to client
-        //just using this for testing purposes
-        public void sendBytes(Object o){
-            try{
-				out.writeObject(o);
-				out.flush();
-				System.out.println("Sent some bytes to Client " + no);
-			}
-			catch(IOException ioException){
-				ioException.printStackTrace();
-			}
-        }
 
 		//send a message to the output stream
 		public void sendMessage(String msg)
@@ -229,6 +217,61 @@ public class Server {
 				closeConnection();
 			}
 		}
+
+		/*
+		 * runs this after handshake.
+		 * Reads any message, then switchs based on the message type
+		 * NOT TESTED YET
+		 * NOT DONE YET
+		 */
+		public void receiveMessage(){
+			try{
+				byte[] msg = (byte[])in.readObject();
+				byte msgType = utils.decompMsgType(msg);
+
+				switch(msgType){
+					case 0:
+
+						break;
+					case 1:
+
+						break;
+					case 2:
+
+						break;
+					case 3:
+
+						break;
+					case 4:
+
+						break;
+					case 5:
+
+						break;
+					case 6:
+
+						break;
+					case 7:
+
+						break;
+					default:
+						System.err.println("Closing connection. Error, Bad msg type: " + msgType);
+						closeConnection();
+						break;
+				} // end of switch statement
+
+
+			}
+			catch(ClassNotFoundException classnot){
+				System.err.println("Class not found");
+				closeConnection();
+			}
+			catch(IOException ioException){
+				ioException.printStackTrace();
+				closeConnection();
+			}
+		}
+
 
 	} // end of handler definition
 

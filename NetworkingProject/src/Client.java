@@ -146,13 +146,21 @@ public class Client {
 		}
 	}
 
-	// still working on this
-	public void sendStream(){
-		int msgLength = 0;
-		byte msgType;
-		byte[] msgPayload;
+	// NOT TESTED YET
+	public void sendBitField(BitField payload){
+		// bitfield messages have a value of 5
+		byte msgType = 5;
 
+		// creates the msg object
+		byte[] msg = utils.createMessage(1 + payload.getNumOfBytes(), msgType, payload.getBitField());
 
+		try{
+			out.writeObject(msg);
+			out.flush(); 
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+		}
 	}
 
 	

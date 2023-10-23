@@ -1,9 +1,3 @@
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.util.Arrays;
-
 public class utils {
 
     // converts int to bytes
@@ -42,6 +36,68 @@ public class utils {
         return r;
     }
 
+    // given the parameters, returns the byte array of everything combined
+    public static byte[] createMessage(int msgLength, byte msgType, byte[] payload){
+        byte[] r = new byte[5 + payload.length];
+
+		// create byte array out of the int of the message length
+		byte[] msgLengthByte = new byte[4];
+		for (int i = 0; i < 4; i++) {
+            msgLengthByte[i] = (byte) (msgLength >> (i * 8));
+        }
+
+        // copies everything into r
+        System.arraycopy(msgLengthByte, 0, r, 0, msgLengthByte.length);
+        r[4] = msgType;
+         System.arraycopy(payload, 0, r, 5, payload.length);
+
+        return r;
+    }
+
+    // NOT TESTED YET
+    // given a message in byte[] form, returns message length
+    public static int decompMsgLength(byte[] msg){
+        if(msg.length < 5){
+            int r = 0;
+
+            byte[] first4Bytes = new byte[4];
+            System.arraycopy(msg, 0, first4Bytes, 0, 4);
+            r = bytesToInt(first4Bytes);
+
+            return r;
+        }
+        else{
+            System.out.println("Error: msg legnth is less than 5");
+            return -1;
+        }
+    }
+
+    // NOT TESTED YET
+    // given a message in byte[] form, returns message type
+    public static byte decompMsgType(byte[] msg){
+        if(msg.length < 5){
+            byte r = msg[4];
+
+            return r;
+        }
+        else{
+            System.out.println("Error: msg legnth is less than 5");
+            return -1;
+        }
+    }
+
+    // NOT TESTED YET
+    // given a message in byte[] form, returns message payload
+    public static byte[] decompMsgPayload(byte[] msg){
+        if(msg.length > 5){
+            int lengthOfNewArray = msg.length - 5;
+            byte[] r = new byte[lengthOfNewArray];
+            System.arraycopy(msg, 5, r, 0, lengthOfNewArray);
+
+            return r;
+        }
+        else return new byte[0];
+    }
 
     public static void main(String args[])
 	{
