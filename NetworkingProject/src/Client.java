@@ -137,12 +137,25 @@ public class Client {
 			serverPeerID = handshakeID;
 		}
 		catch(ClassNotFoundException classnot){
-			// idk
+			System.err.println("Class not found");
+			closeConnection();
 		}
 		catch(IOException ioException){
-			// idk
+			ioException.printStackTrace();
+			closeConnection();
 		}
 	}
+
+	// still working on this
+	public void sendStream(){
+		int msgLength = 0;
+		byte msgType;
+		byte[] msgPayload;
+
+
+	}
+
+	
 
 
 	//main method

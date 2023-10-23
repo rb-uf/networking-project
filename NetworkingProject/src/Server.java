@@ -7,7 +7,50 @@ import java.util.*;
 public class Server {
 
 	private static final int sPort = 8000;   //The server will be listening on this port number
-	private static final int peerID = 1001; // figure out how to set this later
+	public static final int peerID = 1001; // figure out how to set this later
+
+	// variables from common.cfg
+	int NumberOfPreferredNeighbors;
+    int UnchokingInterval;
+    int OptimisticUnchokingInterval;
+    String FileName;
+    int FileSize;
+    int PieceSize;
+	
+	// goes to common.cfg and reads in its info
+	public Server(){
+		Scanner f;
+		try {
+			f = new Scanner(new File("Common.cfg"));
+		}
+		catch (FileNotFoundException exc) {
+			System.out.println("error: Common.cfg file not found");
+			return;
+		}
+
+		f.next(); // skip over the string "NumberOfPreferredNeighbors"; should probably check this
+		NumberOfPreferredNeighbors = f.nextInt();
+		f.next();
+		UnchokingInterval = f.nextInt();
+		f.next();
+		OptimisticUnchokingInterval = f.nextInt();
+		f.next();
+		FileName = f.next();
+		f.next();
+		FileSize = f.nextInt();
+		f.next();
+		PieceSize = f.nextInt();
+	}
+
+	int getNumberOfPreferredNeighbors() { return NumberOfPreferredNeighbors; }
+    int getUnchokingInterval() { return UnchokingInterval; }
+    int getOptimisticUnchokingInterval() { return OptimisticUnchokingInterval; }
+    String getFileName() { return FileName; }
+    int getFileSize() { return FileSize; }
+    int getPieceSize() { return PieceSize; }
+
+
+	
 
 	public static void main(String[] args) throws Exception {
 		System.out.println("The server is running."); 
@@ -172,10 +215,12 @@ public class Server {
 				clientPeerID = handshakeID;
 			}
 			catch(ClassNotFoundException classnot){
-				// idk
+				System.err.println("Class not found");
+				closeConnection();
 			}
 			catch(IOException ioException){
-				// idk
+				ioException.printStackTrace();
+				closeConnection();
 			}
 		}
 
