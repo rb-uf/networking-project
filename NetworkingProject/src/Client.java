@@ -1,7 +1,5 @@
 import java.net.*;
 import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
 import java.util.*;
 
 public class Client {
@@ -14,7 +12,7 @@ public class Client {
 	int peerID = 1002; // figure out how to set this later
 	int serverPeerID;
 
-	public void Client() {}
+	
 
 	void run()
 	{
@@ -33,7 +31,13 @@ public class Client {
 			//get Input from standard input
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
 			while(true)
-			{
+			{	
+				// testing sending a bit field to server.
+				// server should get 1111111111000000. notice the 0s since there are only 10 pieces being used, but 16 bits in 2 bytes
+				BitField testBitField = new BitField(20, 2);
+				testBitField.setAllBits();
+				sendBitField(testBitField);
+				
 				System.out.print("Hello, please input a sentence: ");
 				//read a sentence from the standard input
 				message = bufferedReader.readLine();
@@ -159,9 +163,104 @@ public class Client {
 			out.flush(); 
 		}
 		catch(IOException ioException){
-			ioException.printStackTrace();
+			System.out.println("Error in sendBitField()");
 		}
 	}
+
+	public void sendChoke(){
+		byte msgType = 0;
+		byte[] emptyPayload = new byte[0];
+		byte[] msg = utils.createMessage(1, msgType, emptyPayload);
+
+		try{
+			out.writeObject(msg);
+			out.flush(); 
+		}
+		catch(IOException ioException){
+			System.out.println("Error in sendChoke()");
+		}
+	}
+
+	public void sendUnchoke(){
+		byte msgType = 1;
+		byte[] emptyPayload = new byte[0];
+		byte[] msg = utils.createMessage(1, msgType, emptyPayload);
+
+		try{
+			out.writeObject(msg);
+			out.flush(); 
+		}
+		catch(IOException ioException){
+			System.out.println("Error in sendunChoke()");
+		}
+	}
+
+	public void sendInterested(){
+		byte msgType = 2;
+		byte[] emptyPayload = new byte[0];
+		byte[] msg = utils.createMessage(1, msgType, emptyPayload);
+
+		try{
+			out.writeObject(msg);
+			out.flush(); 
+		}
+		catch(IOException ioException){
+			System.out.println("Error in sendInterested()");
+		}
+	}
+
+	public void sendUninterested(){
+		byte msgType = 3;
+		byte[] emptyPayload = new byte[0];
+		byte[] msg = utils.createMessage(1, msgType, emptyPayload);
+
+		try{
+			out.writeObject(msg);
+			out.flush(); 
+		}
+		catch(IOException ioException){
+			System.out.println("Error in sendUninterested()");
+		}
+	}
+
+	// haveIndex represents the index in the bitfield that says that this client has this piece.
+	public void sendHave(int haveIndex){
+		byte msgType = 4;
+		byte[] payload = utils.intToBytes(haveIndex);
+		byte[] msg = utils.createMessage(5, msgType, payload);
+
+		try{
+			out.writeObject(msg);
+			out.flush(); 
+		}
+		catch(IOException ioException){
+			System.out.println("Error in sendHave()");
+		}
+	}
+
+	// requestIndex represents the index in the bitfield that says that this client wants this piece.
+	public void sendRequest(int requestIndex){
+		byte msgType = 6;
+		byte[] payload = utils.intToBytes(requestIndex);
+		byte[] msg = utils.createMessage(5, msgType, payload);
+
+		try{
+			out.writeObject(msg);
+			out.flush(); 
+		}
+		catch(IOException ioException){
+			System.out.println("Error in sendRequest()");
+		}
+	}
+
+	// sends over the piece with the index pieceIndex in the bitfield
+	// NOT DONE
+	public void sendPiece(int pieceIndex){
+		byte msgType = 7;
+
+	}
+
+	
 
 	
 

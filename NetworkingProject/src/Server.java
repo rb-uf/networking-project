@@ -1,7 +1,5 @@
 import java.net.*;
 import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
 import java.util.*;
 
 public class Server {
@@ -10,14 +8,14 @@ public class Server {
 	public static final int peerID = 1001; // figure out how to set this later
 
 	// variables from common.cfg
-	int NumberOfPreferredNeighbors;
-    int UnchokingInterval;
-    int OptimisticUnchokingInterval;
-    String FileName;
-    int FileSize;
-    int PieceSize;
+	public static int NumberOfPreferredNeighbors;
+    public static int UnchokingInterval;
+    public static int OptimisticUnchokingInterval;
+    public static String FileName;
+    public static int FileSize;
+    public static int PieceSize;
 
-	BitField bf;
+	public static BitField bf;
 	
 	// goes to common.cfg and reads in its info
 	// NOTE: does not check PeerInfo.cfg yet
@@ -86,8 +84,8 @@ public class Server {
        	private ObjectOutputStream out;    //stream write to the socket
 		private int no;		//The index number of the client
 
-		private int clientPeerID;
-		private BitField clientBitField;
+		private int clientPeerID; 
+		private BitField clientBitField; // bit field of the client
 
        	public Handler(Socket connection, int no) {
            	this.connection = connection;
@@ -107,6 +105,10 @@ public class Server {
 				try{
 					while(true)
 					{
+						// tests receiving bit field message and prints it out
+						receiveMessage();
+						System.out.println("Client Bit Field: " + clientBitField.toString());
+
 						//receive the message sent from the client
 						message = (String)in.readObject();
 						//show the message to the user
@@ -245,8 +247,8 @@ public class Server {
 					case 4:
 
 						break;
-					case 5:
-
+					case 5: // bit field
+						receivedBitFieldMsg(msg);
 						break;
 					case 6:
 
@@ -270,6 +272,11 @@ public class Server {
 				ioException.printStackTrace();
 				closeConnection();
 			}
+		}
+
+		// what happens when the server receives a bit field message
+		private void receivedBitFieldMsg(byte[] msg){
+			clientBitField = new BitField(utils.decompMsgPayload(msg), utils.decompMsgLength(msg) - 1);
 		}
 
 

@@ -2,9 +2,16 @@ public class BitField {
     private byte[] data; // The array to store the bits
     private int usedBits; // the number of bits being used (to account for padding of zeros at the end)
 
+    // initializes everything to 0
     public BitField(int fileSize, int pieceSize) {
         usedBits = (fileSize+pieceSize-1)/pieceSize;
         data = new byte[(usedBits + 7) / 8]; // Calculate the array size needed for the specified number of bits
+    }
+
+    // pass in payload bitfield and the length of the payload
+    public BitField(byte[] bf, int length){
+        data = bf;
+        usedBits = length;
     }
 
     // set bit to 1
@@ -64,13 +71,17 @@ public class BitField {
 
     // for testing/demonstration purposes
     public static void main(String[] args) {
+        // creates a new bit field that only uses 10 pieces: 20/2 = 10
         BitField bitField = new BitField(20, 2);
-        bitField.setBit(1);
-        bitField.setBit(2);
+        bitField.setBit(1); // set second bit to 1
+        bitField.setBit(2); // set thrid bit to 1
         System.out.println("After setting index 1 and 2 to true: " + bitField.toString());
-        bitField.clearBit(1);
+        bitField.clearBit(1); // set all bits to 0
         System.out.println("After clearing index 1: " + bitField.toString());
-        bitField.setAllBits();
+
+        // set all bits to 1
+        // notice how there are 0s at the end since only 10 bits are used but there are 16 bits in 2 bytes
+        bitField.setAllBits(); 
         System.out.println("After setting all bits: " + bitField.toString());
     }
 }

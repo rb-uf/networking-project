@@ -41,10 +41,7 @@ public class utils {
         byte[] r = new byte[5 + payload.length];
 
 		// create byte array out of the int of the message length
-		byte[] msgLengthByte = new byte[4];
-		for (int i = 0; i < 4; i++) {
-            msgLengthByte[i] = (byte) (msgLength >> (i * 8));
-        }
+		byte[] msgLengthByte = intToBytes(msgLength);
 
         // copies everything into r
         System.arraycopy(msgLengthByte, 0, r, 0, msgLengthByte.length);
@@ -54,10 +51,14 @@ public class utils {
         return r;
     }
 
-    // NOT TESTED YET
     // given a message in byte[] form, returns message length
     public static int decompMsgLength(byte[] msg){
         if(msg.length < 5){
+            System.out.println("Error: msg legnth is less than 5");
+            return -1;
+            
+        }
+        else{
             int r = 0;
 
             byte[] first4Bytes = new byte[4];
@@ -66,27 +67,21 @@ public class utils {
 
             return r;
         }
-        else{
-            System.out.println("Error: msg legnth is less than 5");
-            return -1;
-        }
     }
 
-    // NOT TESTED YET
     // given a message in byte[] form, returns message type
     public static byte decompMsgType(byte[] msg){
         if(msg.length < 5){
+            System.out.println("Error: msg legnth is less than 5");
+            return -1;
+        }
+        else{
             byte r = msg[4];
 
             return r;
         }
-        else{
-            System.out.println("Error: msg legnth is less than 5");
-            return -1;
-        }
     }
 
-    // NOT TESTED YET
     // given a message in byte[] form, returns message payload
     public static byte[] decompMsgPayload(byte[] msg){
         if(msg.length > 5){
@@ -102,8 +97,17 @@ public class utils {
     public static void main(String args[])
 	{
 		// just here for testing
+        int length = 4;
+        byte msgtype = 7;
+        byte[] payload = {1, 5, 100};
 
+        byte[] msg = createMessage(length, msgtype, payload);
+
+        int mlength = decompMsgLength(msg);
+        byte mtype = decompMsgType(msg);
+        byte[] mpay = decompMsgPayload(msg);
         
+        System.out.println(mtype == 7);
         
 
 	}
