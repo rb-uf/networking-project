@@ -96,18 +96,7 @@ public class utils {
 
     public static void main(String args[])
 	{
-		// just here for testing
-        int length = 4;
-        byte msgtype = 7;
-        byte[] payload = {1, 5, 100};
-
-        byte[] msg = createMessage(length, msgtype, payload);
-
-        int mlength = decompMsgLength(msg);
-        byte mtype = decompMsgType(msg);
-        byte[] mpay = decompMsgPayload(msg);
-        
-        System.out.println(mtype == 7);
+		
         
 
 	}

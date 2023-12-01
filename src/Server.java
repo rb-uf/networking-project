@@ -102,25 +102,11 @@ public class Server {
 				sendHandshake();
 				verifyHandshake();
 
-				try{
-					while(true)
-					{
-						// tests receiving bit field message and prints it out
-						receiveMessage();
-						System.out.println("Client Bit Field: " + clientBitField.toString());
-
-						//receive the message sent from the client
-						message = (String)in.readObject();
-						//show the message to the user
-						System.out.println("Receive message: " + message + " from client " + no);
-						//Capitalize all letters in the message
-						MESSAGE = message.toUpperCase();
-						//send MESSAGE back to the client
-						sendMessage(MESSAGE);
-					}
-				}
-				catch(ClassNotFoundException classnot){
-					System.err.println("Data received in unknown format");
+				
+				while(true)
+				{
+					// tests receiving bit field message and prints it out
+					receiveMessage();
 				}
 			}
 			catch(IOException ioException){
@@ -248,13 +234,15 @@ public class Server {
 
 						break;
 					case 5: // bit field
+						System.out.println("received bitfield message");
 						receivedBitFieldMsg(msg);
 						break;
 					case 6:
 
 						break;
 					case 7:
-
+						System.out.println("received peice message");
+						receivedPieceMsg(msg);
 						break;
 					default:
 						System.err.println("Closing connection. Error, Bad msg type: " + msgType);
@@ -277,6 +265,25 @@ public class Server {
 		// what happens when the server receives a bit field message
 		private void receivedBitFieldMsg(byte[] msg){
 			clientBitField = new BitField(utils.decompMsgPayload(msg), utils.decompMsgLength(msg) - 1);
+		}
+
+		// what happens when the server receives a piece
+		// NOTE: current saves to this this directory, sends whole image
+		private void receivedPieceMsg(byte[] msg){
+			byte[] payload = utils.decompMsgPayload(msg);
+			byte[] imageBytes = Arrays.copyOfRange(payload, 4, payload.length);
+			int index = utils.bytesToInt(Arrays.copyOfRange(payload, 0, 4));
+			
+			System.out.println(index);
+			System.out.println(imageBytes.length);
+
+			String path = "./image.jpg"; // set this up dynamically later
+			try (FileOutputStream fos = new FileOutputStream(path)) {
+				fos.write(imageBytes);
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.err.println("Error saving the image to: " + path);
+			}
 		}
 
 

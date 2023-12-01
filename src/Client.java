@@ -1,6 +1,12 @@
 import java.net.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.io.*;
 import java.util.*;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 
 public class Client {
 	Socket requestSocket;           //socket connect to the server
@@ -27,34 +33,17 @@ public class Client {
 
 			sendHandshake();
 			verifyHandshake();
+
+			sendPiece();
 			
-			//get Input from standard input
-			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
 			while(true)
 			{	
-				// testing sending a bit field to server.
-				// server should get 1111111111000000. notice the 0s since there are only 10 pieces being used, but 16 bits in 2 bytes
-				BitField testBitField = new BitField(20, 2);
-				testBitField.setAllBits();
-				sendBitField(testBitField);
 				
-				System.out.print("Hello, please input a sentence: ");
-				//read a sentence from the standard input
-				message = bufferedReader.readLine();
-				//Send the sentence to the server
-				sendMessage(message);
-				//Receive the upperCase sentence from the server
-				MESSAGE = (String)in.readObject();
-				//show the message to the user
-				System.out.println("Receive message: " + MESSAGE);
 			}
 		}
 		catch (ConnectException e) {
     			System.err.println("Connection refused. You need to initiate a server first.");
 		} 
-		catch ( ClassNotFoundException e ) {
-            		System.err.println("Class not found");
-        	} 
 		catch(UnknownHostException unknownHost){
 			System.err.println("You are trying to connect to an unknown host!");
 		}
@@ -253,11 +242,34 @@ public class Client {
 		}
 	}
 
-	// sends over the piece with the index pieceIndex in the bitfield
-	// NOT DONE
-	public void sendPiece(int pieceIndex){
+	// sends over the piece that is randomly chosen
+	// currently sends whoel image over
+	public void sendPiece() throws IOException{
+		String path = "./src/peer_1001/tree.jpg"; // set this up later to read from path based on peer number
+
 		byte msgType = 7;
 
+		// makes imageBYtes contain byte[] of image
+		Path path2 = Paths.get(path);
+		byte[] imageBytes = Files.readAllBytes(path2);
+
+		int index = 0; // IMPLEMENT CHOOSe INDEX OF PIECE
+		
+		// creates payload, did this because payload contains index of piece, and then the piece bytes
+		byte[] indexBytes = utils.intToBytes(index);
+		byte[] payload = Arrays.copyOf(indexBytes, indexBytes.length + imageBytes.length);
+        System.arraycopy(imageBytes, 0, payload, indexBytes.length, imageBytes.length);
+
+		byte[] msg = utils.createMessage(1+4+imageBytes.length, msgType, payload);
+		
+
+		try{
+			out.writeObject(msg);
+			out.flush(); 
+		}
+		catch(IOException ioException){
+			System.out.println("Error in sendRequest()");
+		}
 	}
 
 	
