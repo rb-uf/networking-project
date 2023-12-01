@@ -1,3 +1,9 @@
+import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 public class utils {
 
     // converts int to bytes
@@ -92,6 +98,50 @@ public class utils {
             return r;
         }
         else return new byte[0];
+    }
+
+    // given the map of chunks, return a single byte[] that can be turned into image or txt or whatever
+    public static byte[] combineChunks(Map<Integer,byte[]> chunks, int fileSize){
+        Map<Integer, byte[]> sortedChunks = new TreeMap<>(chunks);
+
+        // Create the combined byte array
+        byte[] combinedBytes = new byte[fileSize];
+        int currentIndex = 0;
+
+        // Concatenate the byte arrays in increasing order of keys
+        for (byte[] chunk : sortedChunks.values()) {
+            System.arraycopy(chunk, 0, combinedBytes, currentIndex, chunk.length);
+            currentIndex += chunk.length;
+        }
+
+        return combinedBytes;
+    }
+
+    // given file path, index of piece, and piece size: returns the bytes of that piece
+    public static byte[] readPieceBasedOnIndex(String path, int pieceIndex, int pieceSize){
+        int startByte = pieceIndex * pieceSize;
+        
+        try (RandomAccessFile file = new RandomAccessFile(path, "r")) {
+            // Set the file pointer to the starting position
+            file.seek(startByte);
+            
+            // for when its the last piece in the file, so that i dont read more than the file
+            int bytesToRead = (int)Math.min(pieceSize, file.length() - startByte); 
+
+            // Read the specified range of bytes
+            byte[] pieceData = new byte[bytesToRead];
+            int bytesRead = file.read(pieceData);
+
+            if (bytesRead != -1) {
+                return pieceData;
+            } else {
+                System.out.println("End of file reached.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new byte[0];
     }
 
     public static void main(String args[])

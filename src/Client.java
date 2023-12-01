@@ -243,25 +243,19 @@ public class Client {
 	}
 
 	// sends over the piece that is randomly chosen
-	// currently sends whoel image over
+	// maybe have pieceIndex in parameters and it is the caller's job to do the random thing
 	public void sendPiece() throws IOException{
-		String path = "./src/peer_1001/tree.jpg"; // set this up later to read from path based on peer number
+		String path = "peer_1001/tree.jpg"; // set this up later to read from path based on peer number
 
 		byte msgType = 7;
-
-		// makes imageBYtes contain byte[] of image
-		Path path2 = Paths.get(path);
-		byte[] imageBytes = Files.readAllBytes(path2);
-
-		int index = 0; // IMPLEMENT CHOOSe INDEX OF PIECE
 		
-		// creates payload, did this because payload contains index of piece, and then the piece bytes
-		byte[] indexBytes = utils.intToBytes(index);
-		byte[] payload = Arrays.copyOf(indexBytes, indexBytes.length + imageBytes.length);
-        System.arraycopy(imageBytes, 0, payload, indexBytes.length, imageBytes.length);
+		int index = 0; // set this up later for choosing randomly
+		byte[] indexInBytes = utils.intToBytes(index);
+		byte[] pieceData = utils.readPieceBasedOnIndex(path, index, Server.PieceSize);
+		byte[] payload = Arrays.copyOf(indexInBytes, indexInBytes.length + pieceData.length);
+        System.arraycopy(pieceData, 0, payload, 4, pieceData.length);
 
-		byte[] msg = utils.createMessage(1+4+imageBytes.length, msgType, payload);
-		
+		byte[] msg = utils.createMessage(1+4+pieceData.length, msgType, payload);
 
 		try{
 			out.writeObject(msg);

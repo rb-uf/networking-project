@@ -15,7 +15,8 @@ public class Server {
     public static int FileSize;
     public static int PieceSize;
 
-	public static BitField bf;
+	public static BitField bf; // keep track of which chunk it has
+	public static Map<Integer, byte[]> chunks = new HashMap<>(); // maps each chunk of data to piece index
 	
 	// goes to common.cfg and reads in its info
 	// NOTE: does not check PeerInfo.cfg yet
@@ -57,9 +58,11 @@ public class Server {
 	
 
 	public static void main(String[] args) throws Exception {
+		Server s = new Server(); // needs this to just initialize everything in server
 		System.out.println("The server is running."); 
         ServerSocket listener = new ServerSocket(sPort);
 		int clientNum = 1;
+		
         try {
         	while(true) {
             	new Handler(listener.accept(),clientNum).start();
@@ -77,8 +80,6 @@ public class Server {
      	* loop and are responsible for dealing with a single client's requests.
      	*/
 	private static class Handler extends Thread {
-       	private String message;    //message received from the client
-		private String MESSAGE;    //uppercase message send to the client
 		private Socket connection;
        	private ObjectInputStream in;	//stream read from the socket
        	private ObjectOutputStream out;    //stream write to the socket
@@ -105,7 +106,7 @@ public class Server {
 				
 				while(true)
 				{
-					// tests receiving bit field message and prints it out
+					// this is the general function that will catch all of the messages
 					receiveMessage();
 				}
 			}
@@ -268,21 +269,24 @@ public class Server {
 		}
 
 		// what happens when the server receives a piece
-		// NOTE: current saves to this this directory, sends whole image
+		// NOTE: current saves to this directory: "./"
 		private void receivedPieceMsg(byte[] msg){
 			byte[] payload = utils.decompMsgPayload(msg);
 			byte[] imageBytes = Arrays.copyOfRange(payload, 4, payload.length);
 			int index = utils.bytesToInt(Arrays.copyOfRange(payload, 0, 4));
 			
-			System.out.println(index);
-			System.out.println(imageBytes.length);
-
-			String path = "./image.jpg"; // set this up dynamically later
-			try (FileOutputStream fos = new FileOutputStream(path)) {
-				fos.write(imageBytes);
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.err.println("Error saving the image to: " + path);
+			chunks.put(index, imageBytes);
+			
+			// if all chunks have been received, then combine them and save it
+			if(chunks.size() == Math.ceilDiv(FileSize, PieceSize)){
+				String path = "./image.jpg"; // set this up dynamically later
+				byte[] combinedData = utils.combineChunks(chunks, FileSize);
+				try (FileOutputStream fos = new FileOutputStream(path)) {
+					fos.write(combinedData);
+				} catch (IOException e) {
+					e.printStackTrace();
+					System.err.println("Error saving the image to: " + path);
+				}
 			}
 		}
 
