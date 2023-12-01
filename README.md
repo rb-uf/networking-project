@@ -1,4 +1,3 @@
 # networking-project
 
-Features: prints "hello world"
-
+To compile all of the .java files, run `make`.
