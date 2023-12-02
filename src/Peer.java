@@ -1,0 +1,24 @@
+public class Peer { // class which holds information about other peers for a single
+                    // server
+    public int peerID;
+    public int port;
+    public String address;
+    public boolean isInterested;
+    public boolean isInteresting;
+    public boolean isChoking;
+    public boolean isChoked;
+    public boolean isOptChoked; // might want an isOptChoking
+    public BitField bf; // keep track of which chunks they have
+
+    public Peer(int peerID, int port, String address)   {
+        this.peerID = peerID;
+        this.port = port;
+        this.address = address;
+        isInterested = false;
+        isInteresting = false;
+        isChoked = false;
+        isChoking = false;
+        isOptChoked = false;
+        bf = new BitField(PeerProcess.FileSize, PeerProcess.PieceSize);
+    }
+}
