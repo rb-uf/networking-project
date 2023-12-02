@@ -20,6 +20,7 @@ public class PeerProcess {
     public volatile static int serverPeerID; // visible to each thread
     public static boolean hasFile;
     public static Vector<Peer> peers;
+	public static Map<Integer, byte[]> chunks = new HashMap<>(); // maps each chunk of data to piece index
 
 	public static void main(String[] args) throws Exception {
 
@@ -124,15 +125,14 @@ public class PeerProcess {
      	* loop and are responsible for dealing with a single client's requests.
      	*/
     	private static class Handler extends Thread {
-        	private String message;    //message received from the client
-		    private String MESSAGE;    //uppercase message send to the client
 		    private Socket connection;
-        	private ObjectInputStream in;	//stream read from the socket
+        	private ObjectInputStream 	in;	//stream read from the socket
         	private ObjectOutputStream out;    //stream write to the socket
 		    private boolean initiated;		// did this thread initiated the connection
             private int ID;                 // own id
             private int partnerID;          // determined on handshake or construction
-
+			private BitField otherPeerBF;	// keeps track of bitfield of the other peer
+			
         	public Handler(Socket connection) { // received connection, awaiting handshake
             		this.connection = connection;
 	    		    this.initiated = false;
@@ -153,6 +153,7 @@ public class PeerProcess {
 			    out = new ObjectOutputStream(connection.getOutputStream());
 			    out.flush();
 			    in = new ObjectInputStream(connection.getInputStream());
+				
 
                 if (initiated)  { // send handshake
                     sendHandshake();
@@ -162,17 +163,29 @@ public class PeerProcess {
                     receiveHandShake();
                     sendHandshake();
                 }
+
+				// sends bitfield
+				sendBitField();
+
+
+				// handles recieving any message
                 while(true)
                 {
+					receiveMessage();
 
+					// NOTE: temporary line of code, the sendRequest() should be invoked after a bunch of other checks
+					if(utils.getRandomZeroIndex(bf,otherPeerBF) != -1) sendRequest();
+
+					
                 }
             }
             catch(IOException ioException){
                 System.out.println("Disconnect with Peer " + partnerID);
+				closeConnection();
             }
             finally{
                 //Close connections
-                    closeConnection();
+                closeConnection();
             }
 	}
 
@@ -307,6 +320,181 @@ public class PeerProcess {
 	}
 
     /* Borrowed parts from Don's Client.java */
+
+
+	/*
+	 * runs this after handshake.
+	 * Reads any message, then switchs based on the message type
+	 * NOT TESTED YET
+	 * NOT DONE YET
+	 */
+	public void receiveMessage(){
+		try{
+			byte[] msg = (byte[])in.readObject();
+			byte msgType = utils.decompMsgType(msg);
+			switch(msgType){
+				case 0:
+					break;
+				case 1:
+					break;
+				case 2:
+					break;
+				case 3:
+					break;
+				case 4:
+					break;
+				case 5: // bit field
+					receivedBitFieldMsg(msg);
+					break;
+				case 6:
+					receivedRequestMsg(msg);
+					break;
+				case 7:
+					receivedPieceMsg(msg);
+					break;
+				default:
+					System.err.println("Closing connection. Error, Bad msg type: " + msgType);
+					closeConnection();
+					break;
+			} // end of switch statement
+		}
+		catch(ClassNotFoundException classnot){
+			System.err.println("Class not found");
+			closeConnection();
+		}
+		catch(IOException ioException){
+			ioException.printStackTrace();
+			closeConnection();
+		}
+	}
+
+
+	// what happens when the server receives a bit field message
+	private void receivedBitFieldMsg(byte[] msg){
+		System.out.println("Recieving bitfield from peer " + partnerID);
+		otherPeerBF = new BitField(utils.decompMsgPayload(msg), utils.decompMsgLength(msg) - 1);
+	}
+
+	// what happens when the server receives a piece
+	private void receivedPieceMsg(byte[] msg){
+		byte[] payload = utils.decompMsgPayload(msg);
+		byte[] imageBytes = Arrays.copyOfRange(payload, 4, payload.length);
+		int index = utils.bytesToInt(Arrays.copyOfRange(payload, 0, 4));
+
+		System.out.println("Recieving piece ("+index+")from peer " + partnerID);
+		
+		chunks.put(index, imageBytes);
+		
+		// if all chunks have been received, then combine them and save it
+		checkGotAllChunks();
+
+		// updates the server side bitfield
+		bf.setBit(index);
+	}
+
+	public void sendBitField(){
+		System.out.println("Sending bitfield to peer " + partnerID);
+
+		// bitfield messages have a value of 5
+		byte msgType = 5;
+
+		// creates the msg object
+		byte[] msg = utils.createMessage(1 + bf.getNumOfBytes(), msgType, bf.getBitField());
+
+		try{
+			out.writeObject(msg);
+			out.flush(); 
+		}
+		catch(IOException ioException){
+			System.out.println("Error in sendBitField()");
+		}
+	}
+
+	// checks if it has all the chunks
+	// creates the directory and file
+	public void checkGotAllChunks(){
+		if(chunks.size() == Math.ceilDiv(FileSize, PieceSize)){
+			String dirPath = "./peer_"+serverPeerID;
+			String filePath = "./peer_"+serverPeerID + "/" + FileName;
+
+			// checks if directory exists, creates directory
+			File directory = new File(dirPath);
+			if (!directory.exists()) directory.mkdirs();
+
+			byte[] combinedData = utils.combineChunks(chunks, FileSize);
+			try (FileOutputStream fos = new FileOutputStream(filePath)) {
+				fos.write(combinedData);
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.err.println("Error saving the image to: " + filePath);
+			}
+		}
+	}
+
+
+	// sends over the piece based on the index provided
+	public void sendPiece(int index) throws IOException{
+		System.out.println("Sending piece ("+ index +") to peer " + partnerID);
+
+		String path = "peer_"+serverPeerID+"/"+FileName;
+
+		byte msgType = 7;
+		
+		byte[] indexInBytes = utils.intToBytes(index);
+		byte[] pieceData = utils.readPieceBasedOnIndex(path, index, PieceSize);
+		byte[] payload = Arrays.copyOf(indexInBytes, indexInBytes.length + pieceData.length);
+        System.arraycopy(pieceData, 0, payload, 4, pieceData.length);
+
+		byte[] msg = utils.createMessage(1+4+pieceData.length, msgType, payload);
+
+		try{
+			out.writeObject(msg);
+			out.flush(); 
+		}
+		catch(IOException ioException){
+			System.out.println("Error in sendRequest()");
+		}
+	}
+
+	// sends request message
+	// the requested index is randomly chosen based on pieces that have not been requested yet and do not have
+	// NOTE: currently, updates bf upon request. Don't know if this is bad idea or not
+	public void sendRequest(){
+		int requestedIndex = utils.getRandomZeroIndex(bf,otherPeerBF);
+
+		// if sendRequest got called but already have all pieces
+		if(requestedIndex == -1){
+			System.out.println("Error in sendRequest(): already have all pieces, won't throw an exception.");
+			return;
+		}
+
+		bf.setBit(requestedIndex); // sets the requested index so that other calls cannot request the same index
+
+		System.out.println("Sending request ("+ requestedIndex +") to peer " + partnerID);
+
+		byte msgType = 6;
+		byte[] payload = utils.intToBytes(requestedIndex);
+		byte[] msg = utils.createMessage(5, msgType, payload);
+
+		try{
+			out.writeObject(msg);
+			out.flush(); 
+		}
+		catch(IOException ioException){
+			System.out.println("Error in sendRequest()");
+		}
+	}
+
+	// receives the request for a certain piece, then sends over that piece
+	public void receivedRequestMsg(byte[] msg) throws IOException{
+		byte[] payload = utils.decompMsgPayload(msg);
+		int requestedIndex = utils.bytesToInt(payload);
+
+		System.out.println("Recieving request ("+ requestedIndex +") from peer " + partnerID);
+
+		sendPiece(requestedIndex);
+	}
+
 
     }
 

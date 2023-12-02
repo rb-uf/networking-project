@@ -2,6 +2,7 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 
 public class utils {
@@ -144,8 +145,30 @@ public class utils {
         return new byte[0];
     }
 
+    // given 2 bitfields, returns index of a random 0 in selfBitField
+    // where selfBitField doesnt have the piece but otherBitField does
+    public static int getRandomZeroIndex(BitField selfBitField, BitField otherBitField){
+        List<Integer> zeroIndices = new ArrayList<>();
+
+        for (int i = 0; i < selfBitField.usedBits; i++) {
+            if (!selfBitField.checkBit(i) && otherBitField.checkBit(i)) {
+                zeroIndices.add(i);
+            }
+        }
+
+        if (!zeroIndices.isEmpty()) {
+            Random random = new Random();
+            int randomIndex = zeroIndices.get(random.nextInt(zeroIndices.size()));
+            return randomIndex;
+        } else {
+            // No '0' bits found
+            return -1;
+        }
+    }
+
     public static void main(String args[])
 	{
+        
 		
         
 
