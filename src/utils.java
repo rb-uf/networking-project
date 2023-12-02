@@ -166,6 +166,17 @@ public class utils {
         }
     }
 
+
+    // given two bitfield, decides if the second one is interesting to the first
+    // criteria is if second BF has a 1 that first BF does not
+    public static boolean isInterestingBF(BitField selfBitField, BitField otherBitField){
+        for (int i = 0; i < selfBitField.usedBits; i++) {
+            if(otherBitField.checkBit(i) == true && selfBitField.checkBit(i) == false) return true;
+        }
+        
+        return false;
+    }
+
     public static void main(String args[])
 	{
         

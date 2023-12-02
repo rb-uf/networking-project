@@ -3,6 +3,9 @@ import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.*;
 
 public class PeerProcess {
 
@@ -20,6 +23,7 @@ public class PeerProcess {
     public volatile static int serverPeerID; // visible to each thread
     public static boolean hasFile;
     public static Vector<Peer> peers;
+	public static ConcurrentMap<Integer, Peer> peerMap = new ConcurrentHashMap<Integer, Peer>();
 	public static Map<Integer, byte[]> chunks = new HashMap<>(); // maps each chunk of data to piece index
 
 	public static void main(String[] args) throws Exception {
@@ -84,7 +88,9 @@ public class PeerProcess {
                 sPort = currPeerPort;
             }
             else    {
-                peers.add(new Peer(currPeerID, currPeerPort, currPeerAddress));
+                Peer currPeer = new Peer(currPeerID, currPeerPort, currPeerAddress);
+                peers.add(currPeer);
+                peerMap.put(currPeerID, currPeer);
                 f.next();
             }
             contactCounter++;
@@ -92,8 +98,9 @@ public class PeerProcess {
 
 		// initilizes bit field, all values to 0
         bf = new BitField(FileSize, PieceSize);
-        if (hasFile) // if server has the file, set all bits to 1
+        if (hasFile){ // if server has the file, set all bits to 1
 		    bf.setAllBits();
+		}
         
 
         /* Borrowed parts from Don's Server.java */
@@ -131,7 +138,6 @@ public class PeerProcess {
 		    private boolean initiated;		// did this thread initiated the connection
             private int ID;                 // own id
             private int partnerID;          // determined on handshake or construction
-			private BitField otherPeerBF;	// keeps track of bitfield of the other peer
 			
         	public Handler(Socket connection) { // received connection, awaiting handshake
             		this.connection = connection;
@@ -174,7 +180,7 @@ public class PeerProcess {
 					receiveMessage();
 
 					// NOTE: temporary line of code, the sendRequest() should be invoked after a bunch of other checks
-					if(utils.getRandomZeroIndex(bf,otherPeerBF) != -1) sendRequest();
+					if(utils.getRandomZeroIndex(bf,peerMap.get(partnerID).bf) != -1) sendRequest();
 
 					
                 }
@@ -325,7 +331,6 @@ public class PeerProcess {
 	/*
 	 * runs this after handshake.
 	 * Reads any message, then switchs based on the message type
-	 * NOT TESTED YET
 	 * NOT DONE YET
 	 */
 	public void receiveMessage(){
@@ -334,14 +339,19 @@ public class PeerProcess {
 			byte msgType = utils.decompMsgType(msg);
 			switch(msgType){
 				case 0:
+					receivedChokeMsg(msg);
 					break;
 				case 1:
+					receivedUnchokeMsg(msg);
 					break;
 				case 2:
+					receivedInterestedMsg(msg);
 					break;
 				case 3:
+					receivedUninterestedMsg(msg);
 					break;
 				case 4:
+					receivedHaveMsg(msg);
 					break;
 				case 5: // bit field
 					receivedBitFieldMsg(msg);
@@ -372,7 +382,7 @@ public class PeerProcess {
 	// what happens when the server receives a bit field message
 	private void receivedBitFieldMsg(byte[] msg){
 		System.out.println("Recieving bitfield from peer " + partnerID);
-		otherPeerBF = new BitField(utils.decompMsgPayload(msg), utils.decompMsgLength(msg) - 1);
+		peerMap.get(partnerID).bf = new BitField(utils.decompMsgPayload(msg), utils.decompMsgLength(msg) - 1);
 	}
 
 	// what happens when the server receives a piece
@@ -390,6 +400,11 @@ public class PeerProcess {
 
 		// updates the server side bitfield
 		bf.setBit(index);
+
+		// checks if the partnerPeer has anymore interesting pieces, if not, send uninterested
+		if(!utils.isInterestingBF(bf, peerMap.get(partnerID).bf)){
+			sendUninterested();
+		}
 	}
 
 	public void sendBitField(){
@@ -458,13 +473,19 @@ public class PeerProcess {
 
 	// sends request message
 	// the requested index is randomly chosen based on pieces that have not been requested yet and do not have
-	// NOTE: currently, updates bf upon request. Don't know if this is bad idea or not
+	/*
+	 * NOTE: currently, updates bf upon request. Don't know if this is bad idea or not
+	 * This function updates its own bitfield before it received the piece from the request. 
+	 * This means that if a new PeerProcess is initiated while other peers are transferring, then it will assume 
+	 * that this peer has a piece that it has not received yet, so the image will look wonky.
+	 * BUT, this is not an issue because no PeerProcess will be initiated while peers are transferring in our experiment setup.
+	 */
 	public void sendRequest(){
-		int requestedIndex = utils.getRandomZeroIndex(bf,otherPeerBF);
+		int requestedIndex = utils.getRandomZeroIndex(bf,peerMap.get(partnerID).bf);
 
-		// if sendRequest got called but already have all pieces
+		// if sendRequest got called but there are no pieces to request
 		if(requestedIndex == -1){
-			System.out.println("Error in sendRequest(): already have all pieces, won't throw an exception.");
+			System.out.println("sendRequest() called, but no pieces to grab");
 			return;
 		}
 
@@ -493,6 +514,118 @@ public class PeerProcess {
 		System.out.println("Recieving request ("+ requestedIndex +") from peer " + partnerID);
 
 		sendPiece(requestedIndex);
+	}
+
+	// send interested message
+	public void sendInterested(){
+		System.out.println("Sending interested to peer " + partnerID);
+
+		byte msgType = 2;
+		byte[] emptyPayload = new byte[0];
+		byte[] msg = utils.createMessage(1, msgType, emptyPayload);
+
+		try{
+			out.writeObject(msg);
+			out.flush(); 
+		}
+		catch(IOException ioException){
+			System.out.println("Error in sendInterested()");
+		}
+	}
+
+	// just updates isInterestedInMe in peerMap
+	public void receivedInterestedMsg(byte[] msg){
+		System.out.println("Receiving interested from peer " + partnerID);
+		peerMap.get(partnerID).isInterestedInMe = true;
+	}
+
+	// send uninterested message
+	public void sendUninterested(){
+		System.out.println("Sending uninterested to peer " + partnerID);
+
+		byte msgType = 3;
+		byte[] emptyPayload = new byte[0];
+		byte[] msg = utils.createMessage(1, msgType, emptyPayload);
+
+		try{
+			out.writeObject(msg);
+			out.flush(); 
+		}
+		catch(IOException ioException){
+			System.out.println("Error in sendUninterested()");
+		}
+	}
+
+	// just updates isInterestedInMe in peerMap
+	public void receivedUninterestedMsg(byte[] msg){
+		System.out.println("Receiving interested from peer " + partnerID);
+		peerMap.get(partnerID).isInterestedInMe = false;
+	}
+
+	public void sendChoke(){
+		System.out.println("Sending choke to peer " + partnerID);
+		byte msgType = 0;
+		byte[] emptyPayload = new byte[0];
+		byte[] msg = utils.createMessage(1, msgType, emptyPayload);
+
+		try{
+			out.writeObject(msg);
+			out.flush(); 
+		}
+		catch(IOException ioException){
+			System.out.println("Error in sendChoke()");
+		}
+	}
+
+	// just updates isChoked in peerMap
+	public void receivedChokeMsg(byte[] msg){
+		System.out.println("Receiving choke from peer " + partnerID);
+		peerMap.get(partnerID).isChoked = true;
+	}
+
+	public void sendUnchoke(){
+		System.out.println("Sending unchoke to peer " + partnerID);
+		byte msgType = 1;
+		byte[] emptyPayload = new byte[0];
+		byte[] msg = utils.createMessage(1, msgType, emptyPayload);
+
+		try{
+			out.writeObject(msg);
+			out.flush(); 
+		}
+		catch(IOException ioException){
+			System.out.println("Error in sendunChoke()");
+		}
+	}
+
+	// just updates isChoked in peerMap
+	public void receivedUnchokeMsg(byte[] msg){
+		System.out.println("Receiving unchoke from peer " + partnerID);
+		peerMap.get(partnerID).isChoked = false;
+	}
+
+
+	// haveIndex represents the index in the bitfield that says that this client has this piece.
+	public void sendHave(int haveIndex){
+		byte msgType = 4;
+		byte[] payload = utils.intToBytes(haveIndex);
+		byte[] msg = utils.createMessage(5, msgType, payload);
+
+		try{
+			out.writeObject(msg);
+			out.flush(); 
+		}
+		catch(IOException ioException){
+			System.out.println("Error in sendHave()");
+		}
+	}
+
+	// updates the BF in peerMap to reflect that the partnerPeer has this piece
+	public void receivedHaveMsg(byte[] msg){
+		byte[] payload = utils.decompMsgPayload(msg);
+		int haveIndex = utils.bytesToInt(payload);
+
+		peerMap.get(partnerID).bf.setBit(haveIndex);
 	}
 
 
