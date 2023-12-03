@@ -19,7 +19,7 @@ public class Peer { // class which holds information about other peers for a sin
         isInteresting = false;
         isChoked = true;
         isChoking = true;
-        isOptChoked = false;
+        isOptUnchoked = false;
         bf = new BitField(PeerProcess.FileSize, PeerProcess.PieceSize);
         bytesDownloadAmount = 0;
     }
