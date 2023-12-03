@@ -1,47 +1,406 @@
-2023/12/03 17:20:00: Peer 1001 received the 'bitfield' message from 1002.
-2023/12/03 17:20:00: Peer 1001 received the 'interested' message from 1002.
-2023/12/03 17:20:02: Peer 1001 received the 'bitfield' message from 1003.
-2023/12/03 17:20:02: Peer 1001 received the 'interested' message from 1003.
-2023/12/03 17:20:03: Peer 1001 has the preferred neighbors 1002,1003.
-2023/12/03 17:20:03: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:20:03: Peer 1001 is choked by 1002.
-2023/12/03 17:20:03: Peer 1001 is choked by 1003.
-2023/12/03 17:20:06: Peer 1001 has the optimistically unchoked neighbor 1003.
-2023/12/03 17:20:07: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:20:09: Peer 1001 has the optimistically unchoked neighbor 1003.
-2023/12/03 17:20:11: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:20:13: Peer 1001 has the optimistically unchoked neighbor 1003.
-2023/12/03 17:20:14: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:20:18: Peer 1001 has the optimistically unchoked neighbor 1003.
-2023/12/03 17:20:20: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:20:21: Peer 1001 has the optimistically unchoked neighbor 1003.
-2023/12/03 17:20:23: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:20:25: Peer 1001 has the optimistically unchoked neighbor 1003.
-2023/12/03 17:20:26: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:20:28: Peer 1001 has the optimistically unchoked neighbor 1003.
-2023/12/03 17:20:30: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:20:31: Peer 1001 has the optimistically unchoked neighbor 1003.
-2023/12/03 17:20:32: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:20:35: Peer 1001 has the optimistically unchoked neighbor 1003.
-2023/12/03 17:20:36: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:20:37: Peer 1001 has the optimistically unchoked neighbor 1003.
-2023/12/03 17:20:45: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:20:47: Peer 1001 has the optimistically unchoked neighbor 1003.
-2023/12/03 17:20:50: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:20:53: Peer 1001 has the optimistically unchoked neighbor 1003.
-2023/12/03 17:20:54: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:20:55: Peer 1001 has the optimistically unchoked neighbor 1003.
-2023/12/03 17:20:56: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:20:57: Peer 1001 has the optimistically unchoked neighbor 1003.
-2023/12/03 17:20:58: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:20:59: Peer 1001 has the optimistically unchoked neighbor 1003.
-2023/12/03 17:21:00: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:21:01: Peer 1001 has the optimistically unchoked neighbor 1003.
-2023/12/03 17:21:02: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:21:04: Peer 1001 has the optimistically unchoked neighbor 1003.
-2023/12/03 17:21:05: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:21:08: Peer 1001 has the optimistically unchoked neighbor 1003.
-2023/12/03 17:21:09: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:21:11: Peer 1001 has the optimistically unchoked neighbor 1003.
-2023/12/03 17:21:12: Peer 1001 has the optimistically unchoked neighbor 1002.
-2023/12/03 17:21:13: Peer 
+2023/12/03 17:44:29: Peer 1001 received the 'bitfield' message from 1002.
+2023/12/03 17:44:29: Peer 1001 received the 'interested' message from 1002.
+2023/12/03 17:44:31: Peer 1001 received the 'bitfield' message from 1003.
+2023/12/03 17:44:31: Peer 1001 received the 'interested' message from 1003.
+2023/12/03 17:44:32: Peer 1001 has the preferred neighbors 1002,1003.
+2023/12/03 17:44:32: Peer 1001 has the optimistically unchoked neighbor 1002.
+2023/12/03 17:44:32: Peer 1001 is choked by 1002.
+2023/12/03 17:44:32: Peer 1001 is choked by 1003.
+2023/12/03 17:44:33: Peer 1001 has the optimistically unchoked neighbor 1003.
+2023/12/03 17:44:34: Peer 1001 has the optimistically unchoked neighbor 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:34: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1003.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested' message from 1002.
+2023/12/03 17:44:35: Peer 1001 received the 'not interested

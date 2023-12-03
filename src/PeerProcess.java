@@ -659,9 +659,11 @@ public class PeerProcess {
 		// checks if bitfield is interesting or not, then sends interested message
 		if(utils.isInterestingBF(bf, peerMap.get(partnerID).bf)){
 			sendInterested();
+			peerMap.get(partnerID).isInteresting = true;
 		}
 		else{
 			sendUninterested();
+			peerMap.get(partnerID).isInteresting = false;
 		}
 	}
 
@@ -691,10 +693,12 @@ public class PeerProcess {
             Thread.currentThread().interrupt();
         }
 
+		System.out.println("Receiving piece from " + partnerID);
 
 		// checks if the partnerPeer has anymore interesting pieces, if not, send uninterested
 		if(!utils.isInterestingBF(bf, peerMap.get(partnerID).bf)){
 			sendUninterested();
+			peerMap.get(partnerID).isInteresting = false;
 		}
 
 
@@ -787,6 +791,8 @@ public class PeerProcess {
 	 */
 	public void sendRequest(){
 		int requestedIndex = utils.getRandomZeroIndex(bf,peerMap.get(partnerID).bf);
+
+		System.out.println("Sending request to peer " + partnerID);
 
 		// if sendRequest got called but there are no pieces to request
 		if(requestedIndex == -1){
@@ -971,6 +977,12 @@ public class PeerProcess {
 		int haveIndex = utils.bytesToInt(payload);
 
 		peerMap.get(partnerID).bf.setBit(haveIndex);
+
+		// if this bit is interesting, and then send interested if not already
+		if(!bf.checkBit(haveIndex) && !peerMap.get(partnerID).isInteresting){
+			sendInterested();
+			peerMap.get(partnerID).isInteresting = true;
+		}
 
 		// logging the action
 		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
