@@ -271,7 +271,7 @@ public class PeerProcess {
             Vector<ConcurrentMap.Entry<Integer, Peer>> entries = new Vector<ConcurrentMap.Entry<Integer, Peer>>();
             while (itr.hasNext()) { 
                 ConcurrentMap.Entry<Integer, Peer> entry = itr.next(); 
-                if (entry.getValue().isInterested && entry.getValue().isChoking)
+                if (entry.getValue().isInterestedToMe && entry.getValue().isChoking)
                     entries.add(entry);
             }
             
