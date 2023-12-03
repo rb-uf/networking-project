@@ -67,8 +67,9 @@ public class StartRemotePeers {
 				
 				// *********************** IMPORTANT *************************** //
 				// If your program is JAVA, use this line.
-                                System.out.println("[DEBUG] ssh -o \"StrictHostKeyChecking no\" " + pInfo.peerAddress + " cd " + path + "; java PeerProcess " + pInfo.peerId);
-				Runtime.getRuntime().exec("ssh -o \"StrictHostKeyChecking no\" " + pInfo.peerAddress + " cd " + path + "; java PeerProcess " + pInfo.peerId);
+                                String cmd = "ssh -o \"StrictHostKeyChecking no\" " + pInfo.peerAddress + " cd " + path + "; java PeerProcess " + pInfo.peerId + " &";
+                                System.out.println("[DEBUG] " + cmd);
+				Runtime.getRuntime().exec(cmd);
 				
 				// If your program is C/C++, use this line instead of the above line. 
 				//Runtime.getRuntime().exec("ssh " + pInfo.peerAddress + " cd " + path + "; ./peerProcess " + pInfo.peerId);
