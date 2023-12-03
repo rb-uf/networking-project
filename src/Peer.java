@@ -7,8 +7,9 @@ public class Peer { // class which holds information about other peers for a sin
     public boolean isInteresting;
     public boolean isChoking;
     public boolean isChoked;
-    public boolean isOptChoked; // might want an isOptChoking
+    public boolean isOptUnchoked; // might want an isOptChoking
     public BitField bf; // keep track of which chunks they have
+    public long bytesDownloadAmount; // used to unchoke peers
 
     public Peer(int peerID, int port, String address)   {
         this.peerID = peerID;
@@ -17,8 +18,9 @@ public class Peer { // class which holds information about other peers for a sin
         isInterestedInMe = false;
         isInteresting = false;
         isChoked = true;
-        isChoking = false;
+        isChoking = true;
         isOptChoked = false;
         bf = new BitField(PeerProcess.FileSize, PeerProcess.PieceSize);
+        bytesDownloadAmount = 0;
     }
 }
