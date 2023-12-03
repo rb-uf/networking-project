@@ -134,19 +134,6 @@ public class PeerProcess {
             
             // now initialize a timer for unchokingInterval + optimisticChockingInterval
 
-
-        if (serverPeerID == 1002) {
-            Peer interestedPartner = peerMap.get(1003);
-            interestedPartner.isInterested = true;
-            interestedPartner = peerMap.get(1001);
-            interestedPartner.isInterested = true;
-        }
-        if (serverPeerID == 1004) {
-            Peer interestedPartner = peerMap.get(1002);
-            interestedPartner.isInterested = true;
-            interestedPartner = peerMap.get(1001);
-            interestedPartner.isInterested = true;
-        }
         Timer t = new Timer ();
         t.scheduleAtFixedRate (new UnchokingTask(queue), UnchokingInterval*1000 ,UnchokingInterval*1000);
         t.scheduleAtFixedRate (new OptimisticTask(queue), OptimisticUnchokingInterval*1000,OptimisticUnchokingInterval*1000);
@@ -435,39 +422,17 @@ public class PeerProcess {
                 // receive message
                 // if unchoking, send data
                 // printing peer info to test timers
-                // Thread.sleep(3000);
                 
-                // Peer partner = peerMap.get(partnerID);
-                // System.out.println("Printing info on Peer " + partnerID);
-                // System.out.println("Neighbor Status: " + !partner.isChoked);
-                // System.out.println("Optimistic: " + partner.isOptUnchoked);
             }
         }
         catch(IOException ioException){
             System.out.println("Disconnect with Peer " + partnerID);
         }
-        // catch(InterruptedException e)   {
-        //     throw new RuntimeException("Thread interrupted");
-        // }
         finally{
             //Close connections
                 closeConnection();
         }
 	}
-
-
-	// //send a message to the output stream
-	// public void sendMessage(String msg)
-	// {
-	// 	try{
-	// 		out.writeObject(msg);
-	// 		out.flush();
-	// 		System.out.println("Send message: " + msg + " to Peer " + partnerID);
-	// 	}
-	// 	catch(IOException ioException){
-	// 		ioException.printStackTrace();
-	// 	}
-	// }
 
     /* Borrowed parts from Don's Client.java */
 
