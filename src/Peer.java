@@ -3,7 +3,7 @@ public class Peer { // class which holds information about other peers for a sin
     public int peerID;
     public int port;
     public String address;
-    public boolean isInterestedToMe;
+    public boolean isInterestedInMe;
     public boolean isInteresting;
     public boolean isChoking;
     public boolean isChoked;
@@ -15,11 +15,11 @@ public class Peer { // class which holds information about other peers for a sin
         this.peerID = peerID;
         this.port = port;
         this.address = address;
-        isInterestedToMe = false;
+        isInterestedInMe = false;
         isInteresting = false;
         isChoked = true;
         isChoking = true;
-        isOptUnchoked = false;
+        isOptChoked = false;
         bf = new BitField(PeerProcess.FileSize, PeerProcess.PieceSize);
         bytesDownloadAmount = 0;
     }

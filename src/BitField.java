@@ -1,6 +1,6 @@
 public class BitField {
     private byte[] data; // The array to store the bits
-    private int usedBits; // the number of bits being used (to account for padding of zeros at the end)
+    public int usedBits; // the number of bits being used (to account for padding of zeros at the end)
 
     // initializes everything to 0
     public BitField(int fileSize, int pieceSize) {
