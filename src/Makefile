@@ -16,3 +16,9 @@ $(TARGET): $(SOURCE_FILE)
 
 clean:
 	rm -f $(TARGET).class
+
+demo:
+	$(JAVAC) StartRemotePeers.java
+
+run-demo:
+	java StartRemotePeers
