@@ -15,7 +15,8 @@ public class Server {
     public static int FileSize;
     public static int PieceSize;
 
-	public static BitField bf;
+	public static BitField bf; // keep track of which chunk it has
+	public static Map<Integer, byte[]> chunks = new HashMap<>(); // maps each chunk of data to piece index
 	
 	// goes to common.cfg and reads in its info
 	// NOTE: does not check PeerInfo.cfg yet
@@ -57,9 +58,11 @@ public class Server {
 	
 
 	public static void main(String[] args) throws Exception {
+		Server s = new Server(); // needs this to just initialize everything in server
 		System.out.println("The server is running."); 
         ServerSocket listener = new ServerSocket(sPort);
 		int clientNum = 1;
+		
         try {
         	while(true) {
             	new Handler(listener.accept(),clientNum).start();
@@ -77,8 +80,6 @@ public class Server {
      	* loop and are responsible for dealing with a single client's requests.
      	*/
 	private static class Handler extends Thread {
-       	private String message;    //message received from the client
-		private String MESSAGE;    //uppercase message send to the client
 		private Socket connection;
        	private ObjectInputStream in;	//stream read from the socket
        	private ObjectOutputStream out;    //stream write to the socket
@@ -102,25 +103,11 @@ public class Server {
 				sendHandshake();
 				verifyHandshake();
 
-				try{
-					while(true)
-					{
-						// tests receiving bit field message and prints it out
-						receiveMessage();
-						System.out.println("Client Bit Field: " + clientBitField.toString());
-
-						//receive the message sent from the client
-						message = (String)in.readObject();
-						//show the message to the user
-						System.out.println("Receive message: " + message + " from client " + no);
-						//Capitalize all letters in the message
-						MESSAGE = message.toUpperCase();
-						//send MESSAGE back to the client
-						sendMessage(MESSAGE);
-					}
-				}
-				catch(ClassNotFoundException classnot){
-					System.err.println("Data received in unknown format");
+				
+				while(true)
+				{
+					// this is the general function that will catch all of the messages
+					receiveMessage();
 				}
 			}
 			catch(IOException ioException){
@@ -248,13 +235,15 @@ public class Server {
 
 						break;
 					case 5: // bit field
+						System.out.println("received bitfield message");
 						receivedBitFieldMsg(msg);
 						break;
 					case 6:
 
 						break;
 					case 7:
-
+						System.out.println("received peice message");
+						receivedPieceMsg(msg);
 						break;
 					default:
 						System.err.println("Closing connection. Error, Bad msg type: " + msgType);
@@ -277,6 +266,28 @@ public class Server {
 		// what happens when the server receives a bit field message
 		private void receivedBitFieldMsg(byte[] msg){
 			clientBitField = new BitField(utils.decompMsgPayload(msg), utils.decompMsgLength(msg) - 1);
+		}
+
+		// what happens when the server receives a piece
+		// NOTE: current saves to this directory: "./"
+		private void receivedPieceMsg(byte[] msg){
+			byte[] payload = utils.decompMsgPayload(msg);
+			byte[] imageBytes = Arrays.copyOfRange(payload, 4, payload.length);
+			int index = utils.bytesToInt(Arrays.copyOfRange(payload, 0, 4));
+			
+			chunks.put(index, imageBytes);
+			
+			// if all chunks have been received, then combine them and save it
+			if(chunks.size() == Math.ceilDiv(FileSize, PieceSize)){
+				String path = "./image.jpg"; // set this up dynamically later
+				byte[] combinedData = utils.combineChunks(chunks, FileSize);
+				try (FileOutputStream fos = new FileOutputStream(path)) {
+					fos.write(combinedData);
+				} catch (IOException e) {
+					e.printStackTrace();
+					System.err.println("Error saving the image to: " + path);
+				}
+			}
 		}
 
 
