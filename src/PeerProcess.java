@@ -117,7 +117,7 @@ public class PeerProcess {
         // contact all peers already running, thread the connection
         for (int i = 0; i < contactNum; i++)    {
             //create a socket to connect to the peer
-			new Handler(new Socket("localhost", peers.get(i).port), peers.get(i).peerID, connections, queue).start(); // think should replace "localhost" with peers.get(i).address when run on seperate machines
+            new Handler(new Socket(peers.get(i).address, peers.get(i).port), peers.get(i).peerID, connections, queue).start(); // think should replace "localhost" with peers.get(i).address when run on seperate machines
 			System.out.println("Connected to "+ peers.get(i).address + " in port " + peers.get(i).port);
         }
 
