@@ -424,11 +424,11 @@ public class PeerProcess {
 			System.out.println("Error in sendBitField()");
 		}
 	}
-
+	
 	// checks if it has all the chunks
 	// creates the directory and file
 	public void checkGotAllChunks(){
-		if(chunks.size() == Math.ceilDiv(FileSize, PieceSize)){
+		if(chunks.size() == (int)Math.ceil((double) FileSize/PieceSize)){
 			String dirPath = "./peer_"+serverPeerID;
 			String filePath = "./peer_"+serverPeerID + "/" + FileName;
 
