@@ -3,15 +3,16 @@ import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
 import java.util.*;
+import java.util.concurrent.*;
 
 public class PeerProcess {
 
 	private static int sPort;   //The server will be listening on this port number
     
     // variables from common.cfg
-	public static int NumberOfPreferredNeighbors;
-    public static int UnchokingInterval;
-    public static int OptimisticUnchokingInterval;
+	public static int NumberOfPreferredNeighbors; // k
+    public static int UnchokingInterval; // p
+    public static int OptimisticUnchokingInterval; // m
     public static String FileName;
     public static int FileSize;
     public static int PieceSize;
@@ -20,6 +21,8 @@ public class PeerProcess {
     public volatile static int serverPeerID; // visible to each thread
     public static boolean hasFile;
     public static Vector<Peer> peers;
+    public static ConcurrentMap<Integer, Peer> peerMap = new ConcurrentHashMap<Integer, Peer>(); 
+    // maps peerID to Peer info
 
 	public static void main(String[] args) throws Exception {
 
@@ -83,7 +86,9 @@ public class PeerProcess {
                 sPort = currPeerPort;
             }
             else    {
-                peers.add(new Peer(currPeerID, currPeerPort, currPeerAddress));
+                Peer currPeer = new Peer(currPeerID, currPeerPort, currPeerAddress);
+                peers.add(currPeer);
+                peerMap.put(currPeerID, currPeer);
                 f.next();
             }
             contactCounter++;
@@ -108,72 +113,170 @@ public class PeerProcess {
         ServerSocket listener = new ServerSocket(sPort);
 		contactNum++;
         	try {
-            	while(true) {
+            	while(contactNum < contactCounter-1) { // once peer has contected/been contacted by all other peers, move on
                 	new Handler(listener.accept()).start();
 				    System.out.println("Client "  + contactNum + " is connected!");
                     contactNum++;
             		}
         	} finally {
-            		listener.close();
+            		listener.close(); // only closes ServerSocket, not spawned client sockets
         	} 
- 
-    	}
+            
+            // now initialize a timer for unchokingInterval + optimisticChockingInterval
 
-	    /**
-     	* A handler thread class.  Handlers are spawned from the listening
-     	* loop and are responsible for dealing with a single client's requests.
-     	*/
-    	private static class Handler extends Thread {
-        	private String message;    //message received from the client
-		    private String MESSAGE;    //uppercase message send to the client
-		    private Socket connection;
-        	private ObjectInputStream in;	//stream read from the socket
-        	private ObjectOutputStream out;    //stream write to the socket
-		    private boolean initiated;		// did this thread initiated the connection
-            private int ID;                 // own id
-            private int partnerID;          // determined on handshake or construction
+        Timer t = new Timer ();
+        t.scheduleAtFixedRate (new UnchokingTask(), UnchokingInterval*1000 ,UnchokingInterval*1000);
+        t.scheduleAtFixedRate (new OptimisticTask(), OptimisticUnchokingInterval*1000,OptimisticUnchokingInterval*1000);
+        
 
-        	public Handler(Socket connection) { // received connection, awaiting handshake
-            		this.connection = connection;
-	    		    this.initiated = false;
-                    this.partnerID = 0;
-                    this.ID = serverPeerID; 
-        	}
+        while(!peersFinished())
+        {
 
-            public Handler(Socket connection, int partnerID) { // started connection, sends first handshake
-            		this.connection = connection;
-	    		    this.initiated = true;
-                    this.partnerID = partnerID;
-                    this.ID = serverPeerID;
-        	}
+        }
+        t.cancel();
+    }
 
-            public void run() {
- 		    try{
-			    //initialize Input and Output streams
-			    out = new ObjectOutputStream(connection.getOutputStream());
-			    out.flush();
-			    in = new ObjectInputStream(connection.getInputStream());
+    private static class UnchokingTask extends TimerTask   {
+        public void run ()
+        {
+            Iterator<ConcurrentMap.Entry<Integer, Peer> > itr = peerMap.entrySet().iterator(); 
+            
+            SortedMap<Long, Vector<ConcurrentMap.Entry<Integer, Peer>>> sm = new TreeMap<Long, Vector<ConcurrentMap.Entry<Integer, Peer>>>();
+            while (itr.hasNext()) { 
+                ConcurrentMap.Entry<Integer, Peer> entry = itr.next(); 
+                Long key = entry.getValue().bytesDownloadAmount;
+                if (sm.get(key) == null)
+                    sm.put(key, new Vector<ConcurrentMap.Entry<Integer, Peer>>());
+                
+                sm.get(key).add(entry);
+            }
 
-                if (initiated)  { // send handshake
-                    sendHandshake();
-                    verifyHandshake();
+            // now iterate through sm, chaning k entries to prefered neighbors and the rest to choked neighbors.
+            int numberChosen = 0;
+            Iterator<SortedMap.Entry<Long, Vector<ConcurrentMap.Entry<Integer, Peer>>>> smItr = sm.entrySet().iterator(); 
+            while (numberChosen != NumberOfPreferredNeighbors && smItr.hasNext())   {
+                SortedMap.Entry<Long, Vector<ConcurrentMap.Entry<Integer, Peer>>> entry = smItr.next();
+                Vector<ConcurrentMap.Entry<Integer, Peer>> candidates = entry.getValue();
+                if (candidates.size() >= 3) {
+                    numberChosen += randomNeighbors(candidates, NumberOfPreferredNeighbors-numberChosen);
                 }
-                else {
-                    receiveHandShake();
-                    sendHandshake();
+                else    {
+                    numberChosen += makeNeighbors(candidates, NumberOfPreferredNeighbors-numberChosen);
                 }
-                while(true)
-                {
 
+            }
+            while (smItr.hasNext()) { // set rest's isChoked = true
+                SortedMap.Entry<Long, Vector<ConcurrentMap.Entry<Integer, Peer>>> entry = smItr.next();
+                Vector<ConcurrentMap.Entry<Integer, Peer>> candidates = entry.getValue();
+                for (int i = 0; i < candidates.size(); i++) {
+                    candidates.get(i).getValue().isChoked = true; // choked
+                    candidates.get(i).getValue().bytesDownloadAmount = 0; // reset for next interval
                 }
             }
-            catch(IOException ioException){
-                System.out.println("Disconnect with Peer " + partnerID);
+        }
+        private int randomNeighbors(Vector<ConcurrentMap.Entry<Integer, Peer>> list, int maxToSelect) { // randomly sets Peer's in the entries unchoked, rest to choked, returns number chosen
+            Collections.shuffle(list); // randomly orders the elements
+            int numSelected = 0;
+            int i = 0;
+            for (; i < list.size() && numSelected < maxToSelect; i++)   {
+                list.get(i).getValue().isChoked = false; // unchoked
+                list.get(i).getValue().bytesDownloadAmount = 0; // reset for next interval
             }
-            finally{
-                //Close connections
-                    closeConnection();
+            for (;i <list.size(); i++)  { // if there are more to check, set to choked
+                list.get(i).getValue().isChoked = true; // choke
+                list.get(i).getValue().bytesDownloadAmount = 0; // reset for next interval
+            } 
+            return numSelected;
+        }
+        private int makeNeighbors(Vector<ConcurrentMap.Entry<Integer, Peer>> list, int maxToSelect) { // choses elements off the top of the vector as neighbors
+            int numSelected = 0;
+            int i = 0;
+            for (; i < list.size() && numSelected < maxToSelect; i++)   {
+                list.get(i).getValue().isChoked = false; // unchoked
+                list.get(i).getValue().bytesDownloadAmount = 0; // reset for next interval
             }
+            for (;i <list.size(); i++)  { // if there are more to check, set to choked
+                list.get(i).getValue().isChoked = true; // choke
+                list.get(i).getValue().bytesDownloadAmount = 0; // reset for next interval
+            } 
+            return numSelected;
+        }
+    }
+
+    private static class OptimisticTask extends TimerTask   {
+        public void run ()
+        {
+            Iterator<ConcurrentMap.Entry<Integer, Peer>> itr = peerMap.entrySet().iterator(); 
+            Vector<ConcurrentMap.Entry<Integer, Peer>> entries = new Vector<ConcurrentMap.Entry<Integer, Peer>>();
+            while (itr.hasNext()) { 
+                ConcurrentMap.Entry<Integer, Peer> entry = itr.next(); 
+                entry.getValue().isOptUnchoked = false; // set each peer to not first
+                if (entry.getValue().isInterested)
+                    entries.add(entry);
+            }
+            
+            int index = getRandomValue(0, entries.size()-1);
+            entries.get(index).getValue().isOptUnchoked = true;
+            
+        }
+
+        public static int getRandomValue(int Min, int Max) 
+        { 
+            return ThreadLocalRandom.current().nextInt(Min, Max + 1); 
+        } 
+    }
+	
+    private static boolean peersFinished()  {
+        return false; // need to implement
+    }
+    private static class Handler extends Thread {
+		private Socket connection;
+        private ObjectInputStream in;	//stream read from the socket
+        private ObjectOutputStream out;    //stream write to the socket
+		private boolean initiated;		// did this thread initiated the connection
+        private int ID;                 // own id
+        private int partnerID;          // determined on handshake or construction
+        public Handler(Socket connection) { // received connection, awaiting handshake
+        		this.connection = connection;
+	    	    this.initiated = false;
+                this.partnerID = 0;
+                this.ID = serverPeerID; 
+                
+        }
+        public Handler(Socket connection, int partnerID) { // started connection, sends first handshake
+        		this.connection = connection;
+	    	    this.initiated = true;
+                this.partnerID = partnerID;
+                this.ID = serverPeerID;
+        }
+        public void run() {
+ 		try{
+		    //initialize Input and Output streams
+		    out = new ObjectOutputStream(connection.getOutputStream());
+		    out.flush();
+		    in = new ObjectInputStream(connection.getInputStream());
+            if (initiated)  { // send handshake
+                sendHandshake();
+                verifyHandshake();
+            }
+            else {
+                receiveHandShake();
+                sendHandshake();
+            }
+            // send the bitmap
+            while(true)
+            {
+                // receive message
+                // if unchoking, send data
+            }
+        }
+        catch(IOException ioException){
+            System.out.println("Disconnect with Peer " + partnerID);
+        }
+        finally{
+            //Close connections
+                closeConnection();
+        }
 	}
 
 	// //send a message to the output stream
