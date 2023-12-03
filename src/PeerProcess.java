@@ -62,7 +62,7 @@ public class PeerProcess {
 
         // read PeerInfo.cfg
         try {
-			f = new Scanner(new File("PeerInfo_edit.cfg"));
+			f = new Scanner(new File("PeerInfo.cfg"));
 		}
 		catch (FileNotFoundException exc) {
 			System.out.println("error: PeerInfo.cfg file not found");
