@@ -177,6 +177,22 @@ public class utils {
         return false;
     }
 
+
+    // does this after every redoing of the neighbors to a thread group
+    public static void performTasksOnThreadsAfterTimeUp(ThreadGroup threadGroup){
+        Thread[] threads = new Thread[threadGroup.activeCount()];
+        int count = threadGroup.enumerate(threads, false);
+
+        for (int i = 0; i < count; i++) {
+            Thread thread = threads[i];
+            
+            // Instruct the thread to call a function
+            if (thread instanceof PeerProcess.Handler) {
+                ((PeerProcess.Handler) thread).performTasksAfterTimeUp();
+            }
+        }
+    }
+
     public static void main(String args[])
 	{
         

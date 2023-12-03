@@ -6,6 +6,7 @@ public class Peer { // class which holds information about other peers for a sin
     public boolean isInterestedInMe;
     public boolean isInteresting;
     public boolean isChoking;
+    public boolean chokedMe;
     public boolean isChoked;
     public boolean isOptUnchoked; // might want an isOptChoking
     public BitField bf; // keep track of which chunks they have
@@ -22,5 +23,6 @@ public class Peer { // class which holds information about other peers for a sin
         isOptUnchoked = false;
         bf = new BitField(PeerProcess.FileSize, PeerProcess.PieceSize);
         bytesDownloadAmount = 0;
+        chokedMe = true;
     }
 }

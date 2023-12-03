@@ -30,7 +30,13 @@ public class PeerProcess {
     // maps peerID to Peer info
     public static Boolean didChange; // used in timers, needs to be global
 
+	public static ThreadGroup connections;
+
+	// iterates everytime unchokingTask() is ran, each thread checks this to see if they send choke/unchoke message
+	public static int globalIntervalCount = 0; 
+
 	public static void main(String[] args) throws Exception {
+
 
         if (args.length != 1)   {
             System.out.println("Incorrect number of command line arguments.");
@@ -79,7 +85,6 @@ public class PeerProcess {
         String currPeerAddress;
         int currPeerPort;
         peers = new Vector<Peer>();
-        
         while(f.hasNextLine())
         {
             currPeerID = f.nextInt();
@@ -106,7 +111,7 @@ public class PeerProcess {
 		    bf.setAllBits();
 		}
         
-        ThreadGroup connections = new ThreadGroup ("connections");
+        connections = new ThreadGroup ("connections");
         ThreadGroup writer = new ThreadGroup ("writer");
         BlockingQueue<String> queue = new LinkedBlockingQueue<>(BOUND); // Queue for writer/producer log messages
 
@@ -117,7 +122,8 @@ public class PeerProcess {
         // contact all peers already running, thread the connection
         for (int i = 0; i < contactNum; i++)    {
             //create a socket to connect to the peer
-			new Handler(new Socket("localhost", peers.get(i).port), peers.get(i).peerID, connections, queue).start(); // think should replace "localhost" with peers.get(i).address when run on seperate machines
+			// think should replace "localhost" with peers.get(i).address when run on seperate machines
+			new Handler(new Socket("localhost", peers.get(i).port), peers.get(i).peerID, connections, queue).start();
 			System.out.println("Connected to "+ peers.get(i).address + " in port " + peers.get(i).port);
         }
 
@@ -142,6 +148,7 @@ public class PeerProcess {
         t.scheduleAtFixedRate (new UnchokingTask(queue), UnchokingInterval*1000 ,UnchokingInterval*1000);
         t.scheduleAtFixedRate (new OptimisticTask(queue), OptimisticUnchokingInterval*1000,OptimisticUnchokingInterval*1000);
         
+		
 
         while(!peersFinished())
         {
@@ -161,6 +168,11 @@ public class PeerProcess {
         }
         public void run ()
         {
+			// Don's addition to this. used to help threads keep track of when this goes off
+			globalIntervalCount++;
+
+			//System.out.println("Printing out globalIntervalCount: " + globalIntervalCount);
+
             Vector<Integer> neighborsIDs = new Vector<Integer>();
             didChange = false;
 
@@ -214,6 +226,7 @@ public class PeerProcess {
                 log += ".";
                 try{
                     queue.put(log);
+					utils.performTasksOnThreadsAfterTimeUp(connections); // runs this to resend chokes and stuff
                 }
                 catch (InterruptedException e)    {
                     Thread.currentThread().interrupt();
@@ -319,6 +332,7 @@ public class PeerProcess {
                 String log = time + ": Peer " + serverPeerID + " has the optimistically unchoked neighbor " + changedPeerID + ".";
                 try{
                     queue.put(log);
+					utils.performTasksOnThreadsAfterTimeUp(connections); // runs this to resend chokes and stuff
                 }
                 catch (InterruptedException e)    {
                     Thread.currentThread().interrupt();
@@ -361,6 +375,9 @@ public class PeerProcess {
             try {
                 while(true) { // reads from buffer until interupted
                     String log = queue.take(); // get message from queue
+
+					System.out.println("printing out whatever gets to log: "+ log);
+					
                     fWriter.write(log);
                     fWriter.write(System.getProperty( "line.separator" ));
                 }
@@ -383,7 +400,8 @@ public class PeerProcess {
 
         }
     }
-    private static class Handler extends Thread {
+    
+	public static class Handler extends Thread {
 		private Socket connection;
         private ObjectInputStream in;	//stream read from the socket
         private ObjectOutputStream out;    //stream write to the socket
@@ -423,10 +441,14 @@ public class PeerProcess {
                 sendHandshake();
             }
             // send the bitmap
+			sendBitField();
             while(true)
             {
-                // receive message
-                // if unchoking, send data
+                
+				receiveMessage();
+				
+				
+
                 // printing peer info to test timers
                 
             }
@@ -436,7 +458,7 @@ public class PeerProcess {
         }
         finally{
             //Close connections
-                closeConnection();
+            closeConnection();
         }
 	}
 
@@ -566,7 +588,12 @@ public class PeerProcess {
 	 * NOT DONE YET
 	 */
 	public void receiveMessage(){
+		
+		
+
 		try{
+
+
 			byte[] msg = (byte[])in.readObject();
 			byte msgType = utils.decompMsgType(msg);
 			switch(msgType){
@@ -612,9 +639,30 @@ public class PeerProcess {
 
 
 	// what happens when the server receives a bit field message
+	// sends interested if bitfield is interesting
 	private void receivedBitFieldMsg(byte[] msg){
-		System.out.println("Recieving bitfield from peer " + partnerID);
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now(); 
+        String time = dtf.format(now);
+        String log = time + ": Peer " + serverPeerID + " received the 'bitfield' message from " + partnerID + ".";
+		try{
+            logQueue.put(log);
+        }
+        catch (InterruptedException e)    {
+            Thread.currentThread().interrupt();
+        }
+
+		System.out.println("recevied bitfield from peer " + partnerID);
+
 		peerMap.get(partnerID).bf = new BitField(utils.decompMsgPayload(msg), utils.decompMsgLength(msg) - 1);
+		
+		// checks if bitfield is interesting or not, then sends interested message
+		if(utils.isInterestingBF(bf, peerMap.get(partnerID).bf)){
+			sendInterested();
+		}
+		else{
+			sendUninterested();
+		}
 	}
 
 	// what happens when the server receives a piece
@@ -622,8 +670,6 @@ public class PeerProcess {
 		byte[] payload = utils.decompMsgPayload(msg);
 		byte[] imageBytes = Arrays.copyOfRange(payload, 4, payload.length);
 		int index = utils.bytesToInt(Arrays.copyOfRange(payload, 0, 4));
-
-		System.out.println("Recieving piece ("+index+")from peer " + partnerID);
 		
 		chunks.put(index, imageBytes);
 		
@@ -633,14 +679,29 @@ public class PeerProcess {
 		// updates the server side bitfield
 		bf.setBit(index);
 
+		// logging the action
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now(); 
+        String time = dtf.format(now);
+        String log = time + ": Peer " + serverPeerID + " has downloaded the piece " + index + " from " + partnerID + ". Now the number of pieces it has is " + chunks.size() + ".";
+		try{
+            logQueue.put(log);
+        }
+        catch (InterruptedException e)    {
+            Thread.currentThread().interrupt();
+        }
+
+
 		// checks if the partnerPeer has anymore interesting pieces, if not, send uninterested
 		if(!utils.isInterestingBF(bf, peerMap.get(partnerID).bf)){
 			sendUninterested();
 		}
+
+
 	}
 
 	public void sendBitField(){
-		System.out.println("Sending bitfield to peer " + partnerID);
+		System.out.println("sent bitfield to peer "+ partnerID);
 
 		// bitfield messages have a value of 5
 		byte msgType = 5;
@@ -675,13 +736,25 @@ public class PeerProcess {
 				e.printStackTrace();
 				System.err.println("Error saving the image to: " + filePath);
 			}
+
+			// logging the action
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        	LocalDateTime now = LocalDateTime.now(); 
+        	String time = dtf.format(now);
+        	String log = time + ": Peer " + serverPeerID + " has downloaded the complete file.";
+			try{
+        	    logQueue.put(log);
+        	}
+        	catch (InterruptedException e)    {
+        	    Thread.currentThread().interrupt();
+        	}
 		}
 	}
 
 
 	// sends over the piece based on the index provided
 	public void sendPiece(int index) throws IOException{
-		System.out.println("Sending piece ("+ index +") to peer " + partnerID);
+		
 
 		String path = "peer_"+serverPeerID+"/"+FileName;
 
@@ -723,7 +796,6 @@ public class PeerProcess {
 
 		bf.setBit(requestedIndex); // sets the requested index so that other calls cannot request the same index
 
-		System.out.println("Sending request ("+ requestedIndex +") to peer " + partnerID);
 
 		byte msgType = 6;
 		byte[] payload = utils.intToBytes(requestedIndex);
@@ -743,14 +815,13 @@ public class PeerProcess {
 		byte[] payload = utils.decompMsgPayload(msg);
 		int requestedIndex = utils.bytesToInt(payload);
 
-		System.out.println("Recieving request ("+ requestedIndex +") from peer " + partnerID);
 
 		sendPiece(requestedIndex);
 	}
 
 	// send interested message
 	public void sendInterested(){
-		System.out.println("Sending interested to peer " + partnerID);
+		
 
 		byte msgType = 2;
 		byte[] emptyPayload = new byte[0];
@@ -767,13 +838,23 @@ public class PeerProcess {
 
 	// just updates isInterestedInMe in peerMap
 	public void receivedInterestedMsg(byte[] msg){
-		System.out.println("Receiving interested from peer " + partnerID);
+		// logging the action
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now(); 
+        String time = dtf.format(now);
+        String log = time + ": Peer " + serverPeerID + " received the 'interested' message from " + partnerID + ".";
+		try{
+            logQueue.put(log);
+        }
+        catch (InterruptedException e)    {
+            Thread.currentThread().interrupt();
+        }
+
 		peerMap.get(partnerID).isInterestedInMe = true;
 	}
 
 	// send uninterested message
 	public void sendUninterested(){
-		System.out.println("Sending uninterested to peer " + partnerID);
 
 		byte msgType = 3;
 		byte[] emptyPayload = new byte[0];
@@ -790,12 +871,22 @@ public class PeerProcess {
 
 	// just updates isInterestedInMe in peerMap
 	public void receivedUninterestedMsg(byte[] msg){
-		System.out.println("Receiving interested from peer " + partnerID);
+		// logging the action
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now(); 
+        String time = dtf.format(now);
+        String log = time + ": Peer " + serverPeerID + " received the 'not interested' message from " + partnerID + ".";
+		try{
+            logQueue.put(log);
+        }
+        catch (InterruptedException e)    {
+            Thread.currentThread().interrupt();
+        }
 		peerMap.get(partnerID).isInterestedInMe = false;
 	}
 
 	public void sendChoke(){
-		System.out.println("Sending choke to peer " + partnerID);
+		System.out.println("Sent choke to peer " + partnerID);
 		byte msgType = 0;
 		byte[] emptyPayload = new byte[0];
 		byte[] msg = utils.createMessage(1, msgType, emptyPayload);
@@ -811,12 +902,23 @@ public class PeerProcess {
 
 	// just updates isChoked in peerMap
 	public void receivedChokeMsg(byte[] msg){
-		System.out.println("Receiving choke from peer " + partnerID);
-		peerMap.get(partnerID).isChoked = true;
+		// logging the action
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now(); 
+        String time = dtf.format(now);
+        String log = time + ": Peer " + serverPeerID + " is choked by " + partnerID + ".";
+		try{
+            logQueue.put(log);
+        }
+        catch (InterruptedException e)    {
+            Thread.currentThread().interrupt();
+        }
+		System.err.println("Received choke from " + partnerID);
+		peerMap.get(partnerID).chokedMe = true;
 	}
 
 	public void sendUnchoke(){
-		System.out.println("Sending unchoke to peer " + partnerID);
+		System.out.println("Sent unchoke to peer " + partnerID);
 		byte msgType = 1;
 		byte[] emptyPayload = new byte[0];
 		byte[] msg = utils.createMessage(1, msgType, emptyPayload);
@@ -832,8 +934,19 @@ public class PeerProcess {
 
 	// just updates isChoked in peerMap
 	public void receivedUnchokeMsg(byte[] msg){
-		System.out.println("Receiving unchoke from peer " + partnerID);
-		peerMap.get(partnerID).isChoked = false;
+		// logging the action
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now(); 
+        String time = dtf.format(now);
+        String log = time + ": Peer " + serverPeerID + " is unchoked by " + partnerID + ".";
+		try{
+            logQueue.put(log);
+        }
+        catch (InterruptedException e)    {
+            Thread.currentThread().interrupt();
+        }
+		System.out.println("Received unchoke from "+partnerID);
+		peerMap.get(partnerID).chokedMe = false;
 	}
 
 
@@ -858,8 +971,33 @@ public class PeerProcess {
 		int haveIndex = utils.bytesToInt(payload);
 
 		peerMap.get(partnerID).bf.setBit(haveIndex);
+
+		// logging the action
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now(); 
+        String time = dtf.format(now);
+        String log = time + ": Peer " + serverPeerID + " received the 'have' message from " + partnerID + " for the piece "+haveIndex+".";
+		try{
+            logQueue.put(log);
+        }
+        catch (InterruptedException e)    {
+            Thread.currentThread().interrupt();
+        }
 	}
 
+	// perform this everytime time interval is up
+	public void performTasksAfterTimeUp(){
+		if((!peerMap.get(partnerID).isChoked || peerMap.get(partnerID).isOptUnchoked) && peerMap.get(partnerID).isInterestedInMe){
+			sendUnchoke();
+		}
+		else{
+			sendChoke();
+		}
+
+		while(!peerMap.get(partnerID).chokedMe && peerMap.get(partnerID).isInteresting){
+			sendRequest();
+		}
+	}
 
     }
 
