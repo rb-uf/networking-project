@@ -116,6 +116,10 @@ public class PeerProcess {
         BlockingQueue<String> queue = new LinkedBlockingQueue<>(BOUND); // Queue for writer/producer log messages
 
         new LogWriter(serverPeerID, queue, writer).start();
+		// deletes the previous log file
+		String filePath = "log_peer_" + serverPeerID;
+		File file = new File(filePath);
+		file.delete();
 
         /* Borrowed parts from Don's Server.java */
 
@@ -226,7 +230,6 @@ public class PeerProcess {
                 log += ".";
                 try{
                     queue.put(log);
-					utils.performTasksOnThreadsAfterTimeUp(connections); // runs this to resend chokes and stuff
                 }
                 catch (InterruptedException e)    {
                     Thread.currentThread().interrupt();
@@ -332,7 +335,6 @@ public class PeerProcess {
                 String log = time + ": Peer " + serverPeerID + " has the optimistically unchoked neighbor " + changedPeerID + ".";
                 try{
                     queue.put(log);
-					utils.performTasksOnThreadsAfterTimeUp(connections); // runs this to resend chokes and stuff
                 }
                 catch (InterruptedException e)    {
                     Thread.currentThread().interrupt();
@@ -376,7 +378,7 @@ public class PeerProcess {
                 while(true) { // reads from buffer until interupted
                     String log = queue.take(); // get message from queue
 
-					System.out.println("printing out whatever gets to log: "+ log);
+					//System.out.println("printing out whatever gets to log: "+ log);
 					
                     fWriter.write(log);
                     fWriter.write(System.getProperty( "line.separator" ));
@@ -409,6 +411,7 @@ public class PeerProcess {
         private int ID;                 // own id
         private int partnerID;          // determined on handshake or construction
         private BlockingQueue<String> logQueue;
+		private ThreadGroup threadGroup;
 
         public Handler(Socket connection, ThreadGroup tg, BlockingQueue<String> queue) { // received connection, awaiting handshake
             super(tg, String.valueOf(serverPeerID)); // adds thread to thread group, under name of peer id
@@ -417,6 +420,7 @@ public class PeerProcess {
             this.partnerID = 0;
             this.ID = serverPeerID;
             this.logQueue = queue;
+			threadGroup = tg;
         }
         public Handler(Socket connection, int partnerID, ThreadGroup tg, BlockingQueue<String> queue) { // started connection, sends first handshake
             super(tg, String.valueOf(serverPeerID)); // adds thread to thread group, under name of peer id
@@ -425,6 +429,7 @@ public class PeerProcess {
             this.partnerID = partnerID;
             this.ID = serverPeerID;
             this.logQueue = queue;
+			threadGroup = tg;
         }
         public void run() {
  		try{
@@ -442,16 +447,15 @@ public class PeerProcess {
             }
             // send the bitmap
 			sendBitField();
-            while(true)
-            {
-                
+			while(true){
 				receiveMessage();
-				
-				
 
-                // printing peer info to test timers
-                
-            }
+				if(utils.isInterestingBF(bf, peerMap.get(partnerID).bf) && partnerID == 1001){
+					sendRequest();
+				}
+			}
+			
+
         }
         catch(IOException ioException){
             System.out.println("Disconnect with Peer " + partnerID);
@@ -473,6 +477,7 @@ public class PeerProcess {
 		}
 		catch(IOException ioException){
 			ioException.printStackTrace();
+			System.exit(1);
 		}
 	}
 
@@ -634,6 +639,7 @@ public class PeerProcess {
 		catch(IOException ioException){
 			ioException.printStackTrace();
 			closeConnection();
+			System.exit(1);
 		}
 	}
 
@@ -686,20 +692,24 @@ public class PeerProcess {
         LocalDateTime now = LocalDateTime.now(); 
         String time = dtf.format(now);
         String log = time + ": Peer " + serverPeerID + " has downloaded the piece " + index + " from " + partnerID + ". Now the number of pieces it has is " + chunks.size() + ".";
-		try{
-            logQueue.put(log);
-        }
-        catch (InterruptedException e)    {
-            Thread.currentThread().interrupt();
-        }
+		
+        try {
+			logQueue.put(log);
+		} catch (InterruptedException e) {
+			System.err.println("error with logging");
+		}
 
-		System.out.println("Receiving piece from " + partnerID);
+		System.out.println("Receiving piece from " + partnerID + "for piece "+index);
 
 		// checks if the partnerPeer has anymore interesting pieces, if not, send uninterested
 		if(!utils.isInterestingBF(bf, peerMap.get(partnerID).bf)){
 			sendUninterested();
 			peerMap.get(partnerID).isInteresting = false;
 		}
+		else sendRequest();
+
+		// send have messages to all connected clients 
+		utils.sendHaveMsgToAll(threadGroup, index);
 
 
 	}
@@ -737,7 +747,6 @@ public class PeerProcess {
 			try (FileOutputStream fos = new FileOutputStream(filePath)) {
 				fos.write(combinedData);
 			} catch (IOException e) {
-				e.printStackTrace();
 				System.err.println("Error saving the image to: " + filePath);
 			}
 
@@ -776,7 +785,7 @@ public class PeerProcess {
 			out.flush(); 
 		}
 		catch(IOException ioException){
-			System.out.println("Error in sendRequest()");
+			System.out.println("Error in sendPiece()");
 		}
 	}
 
@@ -790,9 +799,10 @@ public class PeerProcess {
 	 * BUT, this is not an issue because no PeerProcess will be initiated while peers are transferring in our experiment setup.
 	 */
 	public void sendRequest(){
+	
 		int requestedIndex = utils.getRandomZeroIndex(bf,peerMap.get(partnerID).bf);
 
-		System.out.println("Sending request to peer " + partnerID);
+		System.out.println("Sending request to peer " + partnerID + " for " + requestedIndex);
 
 		// if sendRequest got called but there are no pieces to request
 		if(requestedIndex == -1){
@@ -813,6 +823,7 @@ public class PeerProcess {
 		}
 		catch(IOException ioException){
 			System.out.println("Error in sendRequest()");
+			System.exit(1);
 		}
 	}
 
@@ -1005,8 +1016,10 @@ public class PeerProcess {
 		else{
 			sendChoke();
 		}
+		
 
-		while(!peerMap.get(partnerID).chokedMe && peerMap.get(partnerID).isInteresting){
+		// only request again if not already requesting
+		if(!peerMap.get(partnerID).chokedMe && peerMap.get(partnerID).isInteresting){
 			sendRequest();
 		}
 	}

@@ -193,6 +193,21 @@ public class utils {
         }
     }
 
+    // does this after every redoing of the neighbors to a thread group
+    public static void sendHaveMsgToAll(ThreadGroup threadGroup, int index){
+        Thread[] threads = new Thread[threadGroup.activeCount()];
+        int count = threadGroup.enumerate(threads, false);
+
+        for (int i = 0; i < count; i++) {
+            Thread thread = threads[i];
+            
+            // Instruct the thread to call a function
+            if (thread instanceof PeerProcess.Handler) {
+                ((PeerProcess.Handler) thread).sendHave(index);
+            }
+        }
+    }
+
     public static void main(String args[])
 	{
         
